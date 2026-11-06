@@ -1,0 +1,74 @@
+export const metadata = {
+  title: "Editing and removing apps",
+  description:
+    "Change an app's framework, source, runtime, commands, limits, environment or address with Edit app, and remove an app cleanly.",
+};
+
+<p className="kicker">Apps</p>
+
+# Editing and removing apps
+
+<div className="lead">
+  Edit app is the New app wizard opened on an existing app. Remove app takes everything that belongs
+  to the app with it, in an order that never leaves nginx pointing at nothing.
+</div>
+
+## Edit app
+
+Choose **Edit** in the app page's header. The same five steps open on what the app has now: its
+framework, source, runtime and version, build and start commands, socket or port, limits,
+environment variables (secrets masked) and its address.
+
+Everything can change except the **name**, which is the app's directory, service and account.
+
+### Review, then save and redeploy
+
+The last step reads the app's files from the server and shows what saving changes as one diff: the
+service, the app's record, its `.env` and its nginx site, plus any old site and certificate that will
+be deleted.
+
+**Save and redeploy** then runs as one job:
+
+1. The settings are written. Each file is copied to `/var/backups/nativevm` first, and the save is
+   refused if one changed on the server since you were shown the diff.
+2. A new release is deployed with them.
+3. The address is re-pointed. A new domain gets its site, and its certificate when HTTPS is on. An
+   address the app no longer has has its site deleted, and a preview port it gave up is freed.
+4. Certificates nothing serves any more are deleted. One that still covers a name the app serves
+   over HTTPS is left for renewal.
+
+<Callout type="tip">
+  To give a domain to an app created without one, open **Edit**, go to its **Domain & SSL** step and
+  add it.
+</Callout>
+
+## Remove app
+
+Choose the trash icon in the app page's header. The dialog lists every site and certificate that will
+be deleted, and every one that won't, with the reason. Type the app's name to enable the button.
+
+Removal happens in this order:
+
+1. **Its nginx sites are deleted**, so nothing is routed to a socket about to vanish.
+2. **The app is stopped**, and its service, directory, account and group are deleted.
+3. **Its certificates are deleted**, with certbot. Nothing is asked of Let's Encrypt, so no rate limit
+   is spent; a certificate you need later is simply issued again.
+
+The app's `.env` and its sites are copied to `/var/backups/nativevm/` before they go.
+
+### What belongs to an app
+
+Native VM decides from the server, not from names:
+
+- **A site** is the app's only when *everything* it routes to is the app: its socket or its port. A
+  site that also routes elsewhere is shared, and stays.
+- **A certificate** is the app's only when every name on it is the app's and no remaining site uses
+  it. One that also covers another app's domain stays.
+
+Two guards hold on the server too: a site is deleted only if it's still exactly what you were shown,
+and a certificate is never deleted while an enabled nginx config still names its files.
+
+<Callout type="note">
+  Removing an app with its files also deletes its Git token from this computer. Removing a *server*
+  from Native VM changes nothing on the server.
+</Callout>

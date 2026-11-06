@@ -1,0 +1,64 @@
+export const metadata = {
+  title: "What's on your server",
+  description:
+    "Every path, account, unit and nginx site Native VM creates on a server, and the data it keeps on your computer.",
+};
+
+<p className="kicker">Reference</p>
+
+# What's on your server
+
+<div className="lead">
+  Everything Native VM creates on a server, in one place. These names are fixed: Native VM recognises
+  its own files by them.
+</div>
+
+## Files and directories
+
+| Path | What it is |
+|---|---|
+| `/usr/local/lib/nativevm/agent-<sha256>.py` | Native VM's helper file. Root-only, run for one action at a time. |
+| `/srv/<app>/` | An app: `repo/`, `releases/`, `shared/` and the `current` link. See [Deploys](/docs/deploys). |
+| `/srv/<app>/shared/.env` | The app's environment, readable only by the app's account. |
+| `/srv/<app>/.nativevm-app.json` | What the app is: its framework, source and settings, so any session can deploy it. |
+| `/opt/nativevm/runtimes/` | Per-app runtimes: Node.js, Python, .NET and Java, side by side. |
+| `/opt/nativevm/runtimes/bin/` | The uv and fnm binaries, verified against checksums in the helper file. |
+| `/var/backups/nativevm/<time>/` | A copy of every file Native VM overwrote or deleted, under its original path. |
+| `~/.nativevm-uploads/` | In the SSH user's home: uploads waiting to be unpacked. Each is removed after use. |
+
+## Accounts
+
+| Account | What it is |
+|---|---|
+| `app-<name>` | One unprivileged account and group per app. nginx's account joins the group so it can reach the app's socket. |
+
+## systemd units
+
+| Unit | What it is |
+|---|---|
+| `<app>.service` | An app's service. |
+| `nativevm-cron-<name>.service` and `.timer` | A cron job: one run of the command, and the timer that starts it. |
+| `nativevm-certbot-renew.timer` | Certificate renewal, installed only when the server has no renewal timer of its own. |
+
+Files Native VM manages start with the line `# Managed by Native VM.`, and it only ever deletes files
+that do.
+
+## nginx sites
+
+| Site | What it is |
+|---|---|
+| `/etc/nginx/sites-available/<domain>` | An app's site for its domain, enabled with a link from `sites-enabled`. |
+| `<app>-port-<port>` | An app's preview port site. |
+
+## Firewall
+
+A preview port gets a ufw rule commented `nativevm preview <app>`. Native VM removes only rules that
+carry its own comment, and never touches the port SSH arrives on.
+
+## On your computer
+
+| What | Where |
+|---|---|
+| Saved servers, trusted host keys, session metrics | The data folder: `~/Library/Application Support/nativevm/Native VM` on macOS, `%LOCALAPPDATA%\nativevm\Native VM` on Windows, `~/.local/share/nativevm/Native VM` on Linux |
+| Passwords, passphrases, Git tokens and your session | Your OS keychain, or `credentials.sqlite3` and `credentials.key` in the data folder if you chose the encrypted store |
+| Your private keys | Where they already are. Native VM stores their path, never a copy. |

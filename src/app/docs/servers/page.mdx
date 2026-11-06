@@ -1,0 +1,136 @@
+export const metadata = {
+  title: "Connecting a server",
+  description:
+    "Prepare a server, connect it with a key or a password, verify its host key, pass the first checks, use jump hosts and import from ~/.ssh/config.",
+};
+
+<p className="kicker">Servers</p>
+
+# Connecting a server
+
+<div className="lead">
+  Native VM manages any VPS running Ubuntu 22.04, Ubuntu 24.04 or Debian 12. It connects over SSH and
+  checks what your apps will need. Nothing is installed without asking.
+</div>
+
+## Before you connect
+
+The server needs three things:
+
+- **A supported distribution.** Ubuntu 22.04 LTS, Ubuntu 24.04 LTS or Debian 12. Anything else is
+  refused with both halves of the answer: what was found, and what is supported.
+- **Root access without a password prompt.** Either sign in as `root` with an SSH key, or as a user
+  with a password-less sudo rule. Native VM never asks for, holds or types a sudo password, so a rule
+  that asks for one can't be used.
+- **The system's Python 3.** Native VM's helper file runs on the Python the distribution ships, which
+  is already there on all three.
+
+To give a user password-less sudo, open a sudoers file for it on the server, as root. `visudo`
+checks the rule before saving it, so a typo can't lock you out of sudo:
+
+```bash
+visudo -f /etc/sudoers.d/deploy
+```
+
+and add this line, replacing `deploy` with the user:
+
+```text
+deploy ALL=(ALL) NOPASSWD: ALL
+```
+
+## Connect a server
+
+In the **Servers** window, choose **Connect a server** and fill in:
+
+| Field | What to enter |
+|---|---|
+| **Name** | What you'll call the server, such as `shop-prod`. |
+| **Client or project** | Optional. Servers are grouped by it in the Servers window. |
+| **Host or IP address** | The server's address. |
+| **SSH port** | Usually 22. |
+| **Username** | `root`, or the user with password-less sudo. |
+| **Sign in with** | **SSH key** or **Password**. See below. |
+
+Then press **Connect and check**. It takes a few seconds.
+
+### Signing in with a key or a password
+
+| Way | You provide | What Native VM keeps |
+|---|---|---|
+| **SSH key** | A private key file, and its passphrase if it has one | The file's *path*, and the passphrase where your credentials are kept |
+| **Password** | The account's password | The password, where your credentials are kept |
+
+A key file is never copied: Native VM stores its path, exactly as OpenSSH's `IdentityFile` does, and
+reads the file when it connects. Rotate the key in place and everything keeps working. The key is
+checked before connecting, so choosing a `.pub` file, a PuTTY `.ppk` or something that isn't a key
+is explained right away. The passphrase field appears only when the key really has one.
+
+See [Credentials](/docs/credentials) for where passwords and passphrases are kept.
+
+### Jump hosts
+
+If the server is only reachable through another one, choose **Connect through (jump host)** and pick
+a saved server to go through. Chains can be as deep as you need; each hop's host key is checked the
+same way. A server that another server jumps through can't be deleted while it's in use.
+
+## Trusting the host key
+
+The first time Native VM reaches a server, it shows the server's host key fingerprint and signs in to
+nothing. Compare it with what your provider shows, then trust it. The question defaults to
+**Cancel**, so pressing Enter never trusts a key by accident.
+
+From then on the key is pinned. If the server ever presents a different key, Native VM refuses the
+connection before signing in, and the only button is **Close**.
+
+<Callout type="warning" title="A changed key is a hard stop">
+  There is no "continue anyway". A changed key means either the server was rebuilt, or something is
+  pretending to be it. If you rebuilt the server yourself, contact support.
+</Callout>
+
+## The first checks
+
+When a server is first connected, and the first time it's opened in each session, Native VM runs a
+checklist:
+
+1. **Root access**: can it become root without a password?
+2. **Supported distribution**: is this Ubuntu 22.04, 24.04 or Debian 12?
+3. **System Python**: is there a Python 3 to run the helper file?
+4. **Agent installed**: is Native VM's helper file on the server, at the right version?
+
+Each check answers on its own, so a server with no sudo rule is still told whether its distribution
+is supported. Every failure says what to change, ready to copy:
+
+```text
+Root access: failed
+sudo -n failed for deploy: sudo: a password is required.
+
+Connect as root with a key, or give this user a password-less rule.
+On the server, run visudo and add:
+    deploy ALL=(ALL) NOPASSWD: ALL
+```
+
+Fix it on the server, then press **Check again**. When everything passes, choose **Open server**.
+
+## Importing from ~/.ssh/config
+
+**Import from SSH config** reads your `~/.ssh/config` and offers its hosts. It maps `Host`,
+`HostName`, `User`, `Port`, `IdentityFile` and `ProxyJump`, following OpenSSH's own rules.
+
+- A host with an `IdentityFile` becomes a key file credential pointing at that same file.
+- A host without one signs in with your running `ssh-agent`.
+- `Match`, `Include` and `ProxyCommand` change how a connection is made, so Native VM tells you it
+  skipped them rather than dropping them silently.
+
+## Editing and removing
+
+Each server in the Servers window has a **⋯** menu to edit or remove it. When editing, leave the
+password or passphrase blank to keep the saved one. Choosing a different key file forgets the old
+passphrase rather than pairing it with the new key.
+
+Removing a server deletes its saved password or passphrase too, wherever it was kept. Nothing on the
+server changes.
+
+<Callout type="pro">
+  The Free plan connects **two servers**. Hosts imported past the limit are skipped, with a message
+  saying why. See [Account and plans](/docs/account-and-plans).
+</Callout>

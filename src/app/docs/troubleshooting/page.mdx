@@ -1,0 +1,130 @@
+export const metadata = {
+  title: "Troubleshooting",
+  description:
+    "Fixes for the problems you're most likely to meet: sudo, host keys, unsupported systems, DNS, preview ports, failed deploys, macOS and plans.",
+};
+
+<p className="kicker">Reference</p>
+
+# Troubleshooting
+
+<div className="lead">
+  Every error in Native VM says what failed and what to do next. These are the ones you're most likely
+  to meet, and what they mean.
+</div>
+
+## Signing in and starting
+
+### "Checking your access" fails
+
+Native VM checks your plan with your Native VM account each time it starts, and needs the internet to
+do it. If the account service doesn't answer, times out, or presents a certificate your computer
+doesn't trust, a dialog says why and offers **Try again** or **Quit**. Your session is kept, so
+nothing needs re-entering once you're back online.
+
+### "Your session has ended"
+
+The account service no longer accepts your session, for example because it expired. Sign in again;
+your email is already filled in.
+
+### macOS won't open the app
+
+This release isn't notarized by Apple yet. Open **System Settings → Privacy & Security** and choose
+**Open Anyway** beside the message about Native VM. Native VM needs macOS 15 or later.
+
+### macOS asks for my keychain password
+
+After an update, macOS sees the new build as a different program the first time it reads a saved
+credential. Enter your password and choose **Always Allow**.
+
+## Connecting
+
+### "sudo: a password is required"
+
+The user you sign in as has no password-less sudo rule, and Native VM never types a sudo password.
+Either sign in as `root` with a key, or add a rule on the server, as root:
+
+```bash
+visudo -f /etc/sudoers.d/deploy
+```
+
+```text
+deploy ALL=(ALL) NOPASSWD: ALL
+```
+
+Then press **Check again**.
+
+### The host key changed
+
+Native VM refuses the connection, and there's no way around it from the app. Either the server was
+rebuilt or reinstalled, or something is answering in its place. Check with your provider. If you
+rebuilt the server yourself, contact support.
+
+### An unsupported distribution
+
+Native VM manages Ubuntu 22.04, Ubuntu 24.04 and Debian 12, and says what it found instead. The other
+checks still run, so you'll still learn whether root access works.
+
+### The key file is refused
+
+Choose the **private** key, not the `.pub` file beside it. PuTTY `.ppk` keys need converting to
+OpenSSH format first, with PuTTYgen or `puttygen key.ppk -O private-openssh -o key`.
+
+## Domains and HTTPS
+
+### "does not point at this server"
+
+The domain's DNS record doesn't point at the server yet, so Native VM didn't ask Let's Encrypt and
+spent none of your five attempts an hour. Check the record where you manage the domain: an **A
+record** with the server's address, or a **CNAME** to its host name. DNS changes can take a while to
+spread. If a CDN or proxy sits in front of the domain, its address is what the domain resolves to.
+
+### A preview port doesn't answer
+
+Native VM opens ufw for the port, but it can't see your provider's firewall. If the check from your
+laptop failed, add an inbound rule for that TCP port in your provider's firewall or security group,
+then press **Open port** on the app's Domain tab. A network on your side that blocks unusual ports
+fails the check the same way.
+
+### nginx rejected a change
+
+The dialog shows nginx's own message, naming the file, the line and the reason. The server was left
+exactly as it was, so there's nothing to clean up: fix the value and try again.
+
+## Deploys
+
+### "Did not come up"
+
+The app started but didn't answer on its socket or port in time, so the previous release was put back
+and keeps serving. Look at the deploy's output on the **Deploys** tab, and at the app's live output on
+its **Overview** tab. Common causes:
+
+- The app listens on a hard-coded port instead of reading `PORT` (or `SOCKET_PATH` for a socket).
+- A `.env` value overrides `PORT` or `HOST`. See [Environment variables](/docs/environment).
+- The start command points at the wrong module or file. Change it under advanced settings in **Edit**.
+
+### The deploy is asking for a token
+
+The app's repository is private and this computer doesn't have its token, for example on a different
+laptop. Enter it once and choose **Save and deploy**. If the host refused a saved token, choose
+**Update token** in the Deploys tab's Repository section.
+
+### A Go, .NET or Java build is refused
+
+Native VM reads the build before sending it. A binary for macOS or Windows, or for another processor,
+is named with what to build instead, such as `GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build` or
+`dotnet publish -r linux-x64 --self-contained`.
+
+## Plans
+
+### "Upgrade to Pro" appears
+
+The Free plan allows two servers, two new apps per server and one cron job per server, without
+Advanced mode. Upgrade on toolxbd.com, then choose **Check my plan again** from the account menu.
+See [Account and plans](/docs/account-and-plans).
+
+## Still stuck?
+
+Open **About Native VM** from the logo at the top left, choose **Copy details**, and email them to
+[toolxbd.info@gmail.com](mailto:toolxbd.info@gmail.com) with what you were doing. They carry the
+build, your system and the data folder's path; nothing about your servers.

@@ -1,0 +1,104 @@
+export const metadata = {
+  title: "Installation",
+  description: "Install Native VM, open it for the first time, keep it up to date, and uninstall it.",
+};
+
+<p className="kicker">Getting started</p>
+
+# Installation
+
+<div className="lead">
+  Native VM is one desktop app. Download it for your system, install it like any other app, and
+  sign in with your Native VM account.
+</div>
+
+Get the files from the [Download](/download) page. Version 0.1.0 is available for **macOS on Apple
+silicon**; Windows, Linux and Intel Mac builds are on the way.
+
+## macOS
+
+<Steps>
+
+### Open the disk image
+
+Open `NativeVM-0.1.0-macos-arm64.dmg` and drag **Native VM** onto the **Applications** link
+beside it.
+
+### Open Native VM
+
+Open it from Applications. This first release isn't notarized by Apple yet, so macOS may say it
+can't check the app for malicious software. Open **System Settings → Privacy & Security**, scroll to
+the message about Native VM, and choose **Open Anyway**. You only do this once.
+
+### Sign in
+
+Native VM opens on its sign-in window. Sign in with your Native VM account, or choose
+**Create an account**. See [Account and plans](/docs/account-and-plans).
+
+</Steps>
+
+Native VM needs **macOS 15 Sequoia or later**. On an older Mac, Finder explains the problem instead
+of the app failing to start.
+
+## Windows
+
+<Callout type="note" title="Coming soon">
+  The Windows build isn't published yet. This is how it will install.
+</Callout>
+
+- Run `NativeVM-0.1.0-windows-x64-setup.exe`. It installs for your user with no administrator
+  prompt; the installer also offers to install for all users.
+- Or unzip the portable `.zip` anywhere and run `Native VM.exe`.
+
+## Linux
+
+<Callout type="note" title="Coming soon">
+  The Linux build isn't published yet. This is how it will install, on Ubuntu 22.04 or 24.04, or
+  Debian 12.
+</Callout>
+
+```bash
+sudo apt install ./nativevm_0.1.0_amd64.deb
+```
+
+Then open **Native VM** from your applications menu, or run `nativevm`. The portable `.tar.gz`
+works without installing: extract it and run `nativevm/nativevm`.
+
+## Updates
+
+Click the Native VM logo at the top left of any window to open **About Native VM**, then choose
+**Check for updates**. Native VM only looks when you ask, and the check carries nothing about your
+servers. When a newer release exists, it offers the page to download it from.
+
+<Callout type="note" title="macOS keychain after an update">
+  Until releases are signed with an Apple Developer ID, macOS sees each new build as a different
+  program. The first time an updated Native VM reads a saved password, macOS asks for your keychain
+  password. Choose **Always Allow**.
+</Callout>
+
+**About Native VM** also shows the version and how to reach support. **Copy details** puts the
+build, your system and the data folder on the clipboard, ready to paste into a support email.
+
+## Where your data lives
+
+Native VM keeps its data on your computer, in one folder:
+
+| System | Data folder |
+|---|---|
+| macOS | `~/Library/Application Support/nativevm/Native VM` |
+| Windows | `%LOCALAPPDATA%\nativevm\Native VM` |
+| Linux | `~/.local/share/nativevm/Native VM` |
+
+It holds your saved servers, the host keys you've trusted, and this session's metrics. Passwords,
+passphrases and tokens are in your OS keychain unless you chose otherwise; see
+[Credentials](/docs/credentials).
+
+## Uninstalling
+
+Delete the app the way you delete any app on your system. The data folder and saved credentials
+stay, so a reinstall picks up where you left off.
+
+<Callout type="tip">
+  To remove saved passwords and passphrases too, delete your servers in Native VM before you
+  uninstall it. Deleting a server deletes its saved secrets, wherever they are kept.
+</Callout>

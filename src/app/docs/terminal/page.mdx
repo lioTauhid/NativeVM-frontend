@@ -1,0 +1,53 @@
+export const metadata = {
+  title: "Terminal and Live Monitor",
+  description:
+    "Terminal tabs on one SSH connection: copy and paste, resizing, scrollback and reconnecting. Live Monitor runs htop on the server while you watch.",
+};
+
+<p className="kicker">Operating a server</p>
+
+# Terminal and Live Monitor
+
+<div className="lead">
+  Terminals open on the server's existing connection: one tab is one channel, and several tabs
+  share the one SSH connection. Live Monitor is the real htop, on one more channel.
+</div>
+
+## Terminal
+
+Choose **Terminal** in the sidebar, or **Open terminal** on the Overview. Every plan has it, in
+either mode. Under the tabs, Native VM spells out the connection you're on, such as
+*SSH · deploy@web-1 · 18 ms · 3 channels on one connection*.
+
+- **Resizing works.** When you resize the window, the server is told the new size, so full-screen
+  programs such as `vim`, `less` and `htop` reflow. A tab opened behind another starts at the
+  visible tab's size, so nothing wraps.
+- **10,000 lines of scrollback** per tab.
+- **Copying and pasting.** Selecting text copies it. The shortcuts are <kbd>Cmd</kbd>+<kbd>C</kbd> and
+  <kbd>Cmd</kbd>+<kbd>V</kbd> on macOS, and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> and
+  <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> elsewhere, so a plain <kbd>Ctrl</kbd>+<kbd>C</kbd>
+  still interrupts the program. Pasting into a program that asked for bracketed paste is wrapped
+  for it.
+- **Works offline.** Everything the terminal needs ships inside the app; nothing is loaded from the
+  internet.
+
+### When the connection drops
+
+The tab shows a banner with **Reconnect**. Its scrollback stays on screen, and reconnecting opens a
+new shell. Native VM reconnects the server itself automatically when you next do something, waiting a
+little longer between each try.
+
+## Live Monitor
+
+**Live Monitor**, in the sidebar, is the real `htop`, running on the server on one channel of the
+window's connection.
+
+- **It runs only while the page is showing.** Leave the page and the channel closes, so htop stops and
+  its redraws stop crossing the network. Coming back starts a fresh one.
+- **A missing htop is installed for you**, with apt, like any other tool Native VM needs.
+- **It runs as the user you signed in as**, not as root. It still sees every process, but it can't
+  signal processes owned by someone else.
+
+<Callout type="pro">
+  Live Monitor is part of Advanced mode, on Pro. On Free it's listed in the sidebar with a lock.
+</Callout>

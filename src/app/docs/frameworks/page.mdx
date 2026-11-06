@@ -1,0 +1,157 @@
+export const metadata = {
+  title: "Frameworks and runtimes",
+  description:
+    "How Native VM runs Django, FastAPI, Flask, Node.js, Next.js, static sites, Go, ASP.NET Core, Spring Boot and OpenClaw, and which runtime versions it offers.",
+};
+
+<p className="kicker">Apps</p>
+
+# Frameworks and runtimes
+
+<div className="lead">
+  Each framework is a preset: a runtime, a start command and the packages it needs. Runtimes are
+  installed per app, never globally, so two apps on one server can run different versions.
+</div>
+
+## At a glance
+
+| Framework | Runtime | Served by | Listens on |
+|---|---|---|---|
+| Django | Python | gunicorn | unix socket |
+| FastAPI | Python | uvicorn | unix socket |
+| Flask | Python | gunicorn | unix socket |
+| Express | Node.js | `npm start` | localhost port |
+| Node.js | Node.js | your start script | localhost port |
+| Next.js | Node.js | `next start`, or Native VM's file server for a static export | localhost port |
+| Static site | Node.js | Native VM's file server | unix socket |
+| Go | none: a Linux binary | your binary | localhost port |
+| ASP.NET Core | .NET, or self-contained | your published app | localhost port |
+| Spring Boot | Java, or self-contained | your jar | localhost port |
+| OpenClaw | Node.js | its Gateway | localhost port |
+
+A socket can't be reached from off the machine, which is one less thing to firewall. Python apps and
+static sites can use either, under advanced settings. Next.js, .NET, Java and OpenClaw need a port,
+because their servers can't listen on a socket nginx may use. A port is assigned from a range and
+kept, checked against what's already listening on the server.
+
+## Runtime versions
+
+A new app is offered each runtime's three newest supported lines, the newest as the default:
+
+| Runtime | Versions | Installed with |
+|---|---|---|
+| Node.js | 26, 24, 22 | fnm |
+| Python | 3.15, 3.14, 3.13 | uv |
+| .NET | 10, 9, 8 | Microsoft's release metadata |
+| Java | 25, 21, 17 | Eclipse Temurin, from Adoptium |
+
+Each runtime lives under `/opt/nativevm/runtimes` and each app's service points at its own, so a
+pinned version is real rather than advisory. An app on an older version keeps it, and Edit app offers
+that version beside these.
+
+Downloads are verified before anything runs as root: the uv and fnm binaries against SHA-256 sums
+written into Native VM's helper file, and .NET and Java archives against the checksums their
+vendors publish.
+
+<Callout type="note">
+  .NET 8 and 9 reach the end of Microsoft support on 10 November 2026, and the wizard says so beside
+  the choice. .NET 10 is supported until November 2028.
+</Callout>
+
+## Python: Django, FastAPI, Flask
+
+Dependencies install into the release's own `.venv`, from the first file found:
+
+| If the project has | Native VM runs |
+|---|---|
+| `uv.lock` | `uv sync --frozen` |
+| `pyproject.toml` | `uv sync` |
+| `requirements.txt` | `uv venv`, then `uv pip install -r requirements.txt` |
+
+If the start command's server (gunicorn, uvicorn, daphne, hypercorn or waitress) isn't among the
+project's dependencies, it's added, so an uploaded Django project without gunicorn still starts.
+A Django starter gets a fresh `DJANGO_SECRET_KEY` in its `.env`.
+
+## Node.js and Express
+
+- `package-lock.json` installs with `npm ci`, `package.json` with `npm install`.
+- With a build command, dev dependencies are installed too, because build tools usually live there.
+  The build runs with `NODE_ENV=production`.
+- The default build is `npm run build --if-present`, and the default start is `npm start`, falling
+  back to `node server.js`.
+- The app's service runs its own Node, by absolute path, with that Node first on its `PATH`.
+
+## Next.js
+
+Built with `npm run build`, then served by `next start` on a localhost port. If the build is a
+**static export** (`output: 'export'`), which `next start` refuses to run, Native VM serves the
+exported files with its own file server instead. It decides per release, so moving between the two
+kinds of build, or rolling back across that move, starts the right way.
+
+## Static site
+
+Plain HTML, or what a front end's build writes: React, Vue, Angular, Svelte, Astro, a Next.js export.
+With a `package.json`, it's built with `npm run build` first. Native VM's own file server serves it:
+
+- **Which folder.** For an upload, the one the scan found, such as `dist`, `build` or
+  `my-app/browser`. From Git, the first of the release itself, `public/`, `dist/`, `build/`,
+  `out/`, `www/`, `_site/`, `.output/public/`, `build/client/` and Angular's `dist/<project>/browser/`.
+- **Clean URLs.** `/about` serves `about`, `about.html` or `about/index.html`.
+- **Unknown routes.** A `200.html` is served for every unknown route, else a `404.html` with status
+  404, else `index.html`, since a single-page app has no other page.
+- **Never served:** dotfiles (except `/.well-known/`), `node_modules`, and anything outside the site.
+- **Caching:** ETags, immutable caching for `_next/static`, and byte ranges for video.
+
+A deploy checks the site before switching to it. A build that wrote no site fails there, and the
+previous release keeps serving.
+
+## Go
+
+Build a Linux binary on your computer, for the server's processor:
+
+```bash
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o server
+```
+
+Upload the binary itself, or a folder or `.zip` with it and whatever it reads beside it. Nothing is
+installed on the server for it: no Go, no runtime, no dependencies. Native VM reads the binary before
+sending it and says what it's built for (`Go 1.23.4 · linux/amd64`); a macOS or Windows program, or
+one for another processor, is named with the `GOOS` and `GOARCH` to build it with. The server checks
+it again before switching to it. The binary gets `PORT` and `HOST`.
+
+From Git, the repository must hold the binary, and the Configure step asks for its start command,
+such as `./server`.
+
+## ASP.NET Core and Spring Boot
+
+These arrive built: the server has no .NET SDK, JDK, Maven or Gradle. Choose how they run:
+
+- **On a runtime installed for the app**: `.NET 10 · 9 · 8`, or `Java 25 · 21 · 17`. Upload what
+  `dotnet publish -c Release -o publish` wrote, or the jar from `target/` or `build/libs/`.
+- **Self-contained**: a `dotnet publish -r linux-x64 --self-contained` build, a GraalVM native image,
+  or a jlink runtime beside the jar. Only libicu is installed, for .NET.
+
+Native VM reads the build to offer only what runs it: the .NET line it was published for, or the Java
+that compiled the jar and newer. ASP.NET Core is given `ASPNETCORE_URLS` and trusts nginx's
+forwarded headers; Spring Boot gets `SERVER_PORT`, `SERVER_ADDRESS` and native forwarded headers.
+
+A JVM can take most of a minute to start on one core, so a Java app has two minutes and a .NET app
+one minute to come up before a deploy counts as failed. Other apps have 20 seconds.
+
+## OpenClaw
+
+OpenClaw is a self-hosted AI assistant, not a framework for your own code. Native VM installs it from
+npm and runs it like any other app, with its own account, service and releases.
+
+- Every deploy installs the newest release; **Roll back** returns to the one before.
+- It runs on Node.js 26 or 24, on a localhost port, and has 90 seconds to come up.
+- Its gateway token is generated with the app and kept in its `.env`.
+- Reach it on a domain with HTTPS, or through an SSH tunnel with no public address. **Preview with
+  port** is refused: plain HTTP would carry its token in the clear.
+- Its agent runs commands on the server as the app's own account: it can write only in its app
+  directory and can't use sudo. The Review step says so before anything is created.
+
+## Other
+
+For code the grid doesn't name: there's no starter, and the upload is started the way its detection
+says. An empty start command means the runtime's default.

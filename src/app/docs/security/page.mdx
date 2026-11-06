@@ -1,0 +1,89 @@
+export const metadata = {
+  title: "Security model",
+  description:
+    "How Native VM protects servers it holds root on: agentless design, pinned host keys, secrets in the keychain, no shell strings, diffs, snapshots and atomic writes.",
+};
+
+<p className="kicker">Reference</p>
+
+# Security model
+
+<div className="lead">
+  Native VM holds root on production servers. These controls aren't settings you can turn off;
+  they're how it's built.
+</div>
+
+## Agentless by design
+
+The app on your computer is the control plane. The server only ever sees SSH.
+
+- **Nothing listens on a port** on your server for Native VM, and **nothing runs between actions**.
+- Privileged work goes through one file, `/usr/local/lib/nativevm/agent-<sha256>.py`: owned by root,
+  readable only by root, and named for the SHA-256 of its own contents. It's run with
+  `sudo -n /usr/bin/python3` for the length of one action, then exits. Deleting it costs nothing but
+  the next upload.
+- It's installed with the bytes on standard input, never on a command line, written beside its final
+  name and renamed into place, so a dropped connection can't leave a truncated file to be run as root.
+  Because the name is the hash, checking that the right version is installed is one checksum.
+
+## Values, not shell strings
+
+A path, a file name or a file's contents travel as a **value** the whole way: a JSON string on the
+wire, a Python string on the server, never parsed by a shell. A file called `$(whoami).conf` is created
+under exactly that name. Where a command is unavoidable, it's an argument list with every value
+quoted, and runs with `LC_ALL=C`, so output is the same in every locale.
+
+Native VM reads machine-readable interfaces, such as `/proc`, `systemctl show` and the journal's JSON,
+and never scrapes output written for people, whose format drifts between versions.
+
+## Host keys
+
+Host keys are trusted on first use, with the fingerprint shown to you, and pinned. A key that later
+differs is a hard failure before authentication: no "continue anyway", no flag, no setting. Jump hosts
+are verified the same way, hop by hop. For a server it knows, Native VM only accepts the key types it
+has pinned, so a stranger can't turn a mismatch into a softer "new key type" question.
+
+## Secrets
+
+- Kept in your **OS keychain** by default, or sealed with **AES-256-GCM** in Native VM's own store if
+  you choose. See [Credentials](/docs/credentials).
+- **Never** written in plaintext, never logged, never in the inventory of servers.
+- **Never on a command line**, where `ps` shows it to every user. Secrets travel on standard input or
+  in the environment.
+- **Key files are never copied**: Native VM keeps their path and reads them when it connects.
+- **Never a sudo password.** Root comes from key-based root login or a password-less sudo rule.
+  Native VM never asks for, holds or types a sudo password.
+
+## Changing things safely
+
+- **A diff before every change.** nginx sites, unit files, an app's environment, cron jobs and config
+  files are shown as a diff, and nothing is sent until you confirm.
+- **The server is the source of truth.** Native VM re-reads before every edit and refuses to write if
+  the file's checksum moved since you were shown it, with a diff of the change. There's no button to
+  force it.
+- **A snapshot before every overwrite.** The original is copied to
+  `/var/backups/nativevm/<time>/` first, in the same step as the write.
+- **Atomic writes.** Temporary file, flush, rename, then flush the directory: a dropped connection
+  never leaves half a config.
+- **nginx changes test themselves.** Every change runs `nginx -t`, reloads, and checks nginx is still
+  running, and puts everything back if either fails. See [Domains](/docs/domains#how-nginx-is-changed).
+
+## Apps are isolated from each other
+
+Each app runs as its own unprivileged account, `app-<name>`. Its `.env` is readable only by that
+account, so an app that's broken into can't read another app's secrets. Its unit file holds no secret.
+
+## The network
+
+Native VM talks to the internet in two places, both over HTTPS with certificates verified and never
+relaxed:
+
+- **The account service**, when you sign in and when the app starts, to check your plan.
+- **The update check**, only when you choose **Check for updates**.
+
+Neither carries anything about your servers.
+
+## A product boundary, not a security one
+
+Plan limits are enforced by the app on your own computer. They decide what the app offers, never
+what's safe: every control on this page applies on every plan.

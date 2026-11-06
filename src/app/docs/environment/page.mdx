@@ -1,0 +1,70 @@
+export const metadata = {
+  title: "Environment variables",
+  description:
+    "Set an app's environment variables, upload a .env file, and know when a change needs a restart or a redeploy.",
+};
+
+<p className="kicker">Apps</p>
+
+# Environment variables
+
+<div className="lead">
+  An app's environment lives in one file on the server, `/srv/<app>/shared/.env`, readable only by
+  the app's own account. Every release uses it, and you edit it from the app's Environment tab.
+</div>
+
+## Editing the environment
+
+Open the app and choose its **Environment** tab, or set variables in the wizard's **Configure** step
+under advanced settings. On every plan, in either mode.
+
+Saving shows a diff first. Secret-looking values stay masked, and a replaced one is marked
+*(changed)*, so even a masked diff shows that a secret moved. Only the lines that changed are
+touched, so the file's comments and order survive.
+
+## After saving: restart or redeploy
+
+A saved environment isn't in use yet. Native VM asks what the app needs:
+
+- **Restart now** is enough for most apps: systemd reads `.env` each time the app starts.
+- **Redeploy now** is recommended when the app has a build that bakes values into the files it
+  makes, or when a variable with a front-end prefix changed, such as `NEXT_PUBLIC_` or `VITE_`. No
+  restart changes those.
+- **Later** leaves the running app as it is.
+
+Prebuilt code (Go, .NET and Java) is never built on the server, so it only ever needs a restart. A
+stopped app isn't started for you, and an app not yet deployed uses the file on its first deploy.
+
+## Uploading a .env file
+
+**Upload .env file**, beside the variables, merges a `.env` file from your computer into the app's
+environment. Only its variables travel; the file, its comments and its name stay on your computer.
+
+- It's read strictly. Values are kept exactly as written, quotes and all.
+- A line that isn't `NAME=value` is skipped, and reported by its line number, never by its text,
+  which could be a secret.
+- A quoted value that spans several lines, such as a PEM key, is skipped whole. So is a value over
+  4,096 characters, and the file can be at most 1 MB.
+- **The file wins.** A variable already set keeps its place and takes the file's value; new ones go
+  at the end. The note under the heading names what was added and replaced, never a value.
+
+## Variables Native VM sets
+
+The app's service sets a few variables itself, so the app knows where to listen. An uploaded `.env`
+leaves them out, because a value in `.env` would override the service's:
+
+| Variable | For |
+|---|---|
+| `PORT`, `HOST` | Apps on a port |
+| `SOCKET_PATH` | Apps on a unix socket |
+| `ASPNETCORE_URLS` | ASP.NET Core |
+| `SERVER_PORT`, `SERVER_ADDRESS` | Spring Boot |
+| `DOTNET_ROOT`, `JAVA_HOME` | .NET and Java apps on an installed runtime |
+
+You can still set one of these by hand, and it's set as you typed it. Setting `PORT=3000` this way
+would leave nginx proxying to a port your app no longer uses, so do it only on purpose.
+
+<Callout type="tip">
+  A Java app's heap follows its memory limit when one is set. To choose otherwise, set
+  `JAVA_TOOL_OPTIONS=-Xmx512m` in its environment.
+</Callout>

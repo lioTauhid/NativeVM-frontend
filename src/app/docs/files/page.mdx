@@ -1,0 +1,74 @@
+export const metadata = {
+  title: "Files",
+  description:
+    "Browse, transfer and edit files on your server. Every write is atomic, every config save is checked against the server's copy and snapshotted first.",
+};
+
+<p className="kicker">Operating a server</p>
+
+# Files
+
+<div className="lead">
+  The file manager browses and edits the server over the connection you already have. Writes are
+  atomic, and a config file is never overwritten blindly.
+</div>
+
+## Where you can go
+
+In easy mode, the file manager shows your **apps**: each app's directory under `/srv`. Each app's
+page also has a **Files** tab that opens straight onto it.
+
+<Callout type="pro">
+  In Advanced mode, on Pro, it also opens **Home**, the **logs** and the **nginx config**. On Free,
+  Home is listed with a lock.
+</Callout>
+
+## Browsing
+
+Listings stream: a directory with a hundred thousand files starts appearing at once, and is sorted
+when the listing completes. If you move on before a listing finishes, what was still arriving for the
+old directory is discarded. Choosing a file shows a preview beside the list.
+
+## Transfers
+
+Native VM picks the fastest safe way for each job:
+
+| Work | How |
+|---|---|
+| A folder, up or down | rsync over SSH. Thousands of small files over SFTP are slow; rsync moved 2,000 in 0.3 s in testing. |
+| A single file | SFTP, streamed in chunks, with progress you can trust and a cancel that lands mid-file. |
+| Sizes and search | `du` and `find` on the server, in one command rather than one round trip per file. |
+
+rsync checks the server's host key against the one you trusted, strictly. It signs in with your key
+file or `ssh-agent`. A saved **password** can't be handed to rsync safely, so for servers you sign in
+to with a password, folders travel over SFTP instead, and the transfer says so rather than being
+quietly slow.
+
+## Saving files your user can't write
+
+SFTP runs as the user it signed in as and can't become root partway through. So when a file needs
+root, Native VM writes it through `sudo -n` on the same connection: the bytes go to a temporary file
+beside the destination, its mode is set, and it's renamed over the original. This is a choice made
+for the file, never a retry: a write that failed on permissions may have failed for another reason
+too.
+
+`sudo -n` never prompts. Where there's no password-less rule, Native VM says so and how to add one.
+
+## Every write is atomic
+
+A write goes to a temporary file in the destination's own directory, is flushed to disk, then renamed
+over the original. Nothing ever truncates a file and then writes it, so an interrupted save leaves the
+original intact. Cancelling a transfer removes its temporary file.
+
+## Editing a config file
+
+Open a file to edit it in place. Saving is never a blind overwrite:
+
+1. When you open the file, Native VM remembers its checksum.
+2. When you save, it reads the file again. If it changed, you get a diff of their change and **nothing
+   is written**. There's deliberately no button to force it.
+3. Only when the file is unchanged is the original copied to `/var/backups/nativevm/<time>/`, keeping
+   its path, and your version written atomically.
+
+The editor highlights the shapes configuration files have in common, so a config reads clearly
+without a heavyweight code editor.

@@ -1,0 +1,66 @@
+export const metadata = {
+  title: "Uninstaller",
+  description:
+    "See the packages you installed on a server and remove one safely: Native VM plans the removal, shows it, then removes exactly that.",
+};
+
+<p className="kicker">Operating a server</p>
+
+# Uninstaller
+
+<div className="lead">
+  The Uninstaller lists the packages installed on the server on request, by hand or by Native VM,
+  and removes them. Every removal is planned, shown to you, then done exactly, or not at all.
+</div>
+
+<Callout type="pro">
+  The Uninstaller is part of Advanced mode, on Pro.
+</Callout>
+
+## What's listed
+
+Every package apt marks as installed on request, less the system's own. The system's own are what the
+distribution counts as essential, required, important or standard, its meta-packages, the kernel and
+boot loader, systemd, networking, ufw, cloud agents, and what Native VM itself needs to get in, such
+as `python3`, `sudo` and `openssh-server`. So is everything those depend on, which is why Ubuntu
+Server's own git and htop aren't listed: removing them would take the server package with them.
+
+The page counts what it leaves out rather than hiding it silently.
+
+## Removing a package
+
+Choose **Uninstall** beside a package. Native VM first asks apt what would happen, changing nothing,
+and shows you the plan:
+
+- every package that would go, and why: the one you chose, what depends on it, and what only it
+  needed;
+- the systemd units those packages ship;
+- the space freed;
+- what Native VM stops being able to do. Remove nginx and its sites stop answering; remove certbot
+  and certificates stop renewing.
+
+Old leftovers, such as previous kernels, aren't this removal's and stay.
+
+When you confirm, Native VM asks apt again and removes the packages **only if apt would remove exactly
+that list**. If the server changed since you looked, nothing is removed, and you're told what's
+different. Asking again once they're gone does nothing, so retrying after a dropped connection is
+harmless.
+
+### What's refused
+
+A plan is refused outright for a system package, for a package that's held with `apt-mark hold`
+(unholding it is your call, and the message says how), for a removal that would take a system package
+with it, and for one where apt would install a replacement.
+
+## Remove, never purge
+
+Configuration files and data stay, so reinstalling a package brings it back as it was. Purge isn't
+offered on purpose: a database package's purge can delete its data.
+
+## What it doesn't touch
+
+Snaps, pip and npm global packages, and the runtimes Native VM keeps per app under
+`/opt/nativevm/runtimes`. Removing one of those would break the apps pinned to it.
+
+After a removal, Native VM forgets what it knew was installed, so the next step that needs a removed
+tool installs it again.

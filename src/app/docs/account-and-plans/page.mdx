@@ -1,0 +1,96 @@
+export const metadata = {
+  title: "Account and plans",
+  description:
+    "Create a Native VM account, sign in and out, and what the Free and Pro plans allow, including Advanced mode.",
+};
+
+<p className="kicker">Getting started</p>
+
+# Account and plans
+
+<div className="lead">
+  Native VM is used signed in. Your account decides your plan, Free or Pro, and the app asks for it
+  each time it starts.
+</div>
+
+## Creating an account
+
+Accounts are made on toolxbd.com. Choose **Create an account** on Native VM's sign-in window, or go
+to [toolxbd.com/register](https://www.toolxbd.com/register). Native VM never sees that form. Once the
+account exists, come back and sign in with the same email and password.
+
+## Signing in
+
+Native VM opens on its sign-in window, and no server window opens until you've signed in and your
+access has been checked. While it checks, the window says **Checking your access**.
+
+Your session is kept where your credentials are kept, the OS keychain unless you chose otherwise:
+your email and a session token, never your password. The next time you open Native VM, it checks the
+session's access again and opens straight onto your servers.
+
+| What the account service answers | What happens |
+|---|---|
+| Your access is fine | Your servers open. |
+| Your session has ended | You're asked to sign in again, with your email filled in. |
+| Your account has no access | You see the service's reason, and the sign-in form. |
+| No answer, a timeout or an untrusted certificate | A dialog says why, with **Try again** or **Quit**. Your session is kept. |
+
+<Callout type="note">
+  Native VM talks to the internet in two places only: the account service, when you sign in and when
+  the app starts, and the update check, when you ask for it. Nothing about your servers is sent to
+  either.
+</Callout>
+
+## Signing out
+
+Open the account menu at the right of any window's top bar and choose **Sign out**. After you
+confirm, Native VM removes the session, closes every server window, disconnecting each server, and
+shows the sign-in window.
+
+## Free and Pro
+
+| | Free | Pro |
+|---|---|---|
+| Servers | 2 | No limit |
+| Apps created on each server | 2 | No limit |
+| Cron jobs on each server | 1 | No limit |
+| Terminal | Yes | Yes |
+| Wizard's advanced settings: commands, limits, environment | Yes | Yes |
+| An app's environment variables | Yes | Yes |
+| Advanced mode | No | Yes |
+| Live Monitor and Uninstaller | No | Yes |
+| Files outside the apps: Home, logs, nginx config | No | Yes |
+| New apps from a private Git repository | No | Yes |
+
+The top bar's account says **Free** or **Pro**. On Free, the Servers window shows how much of the
+plan is in use, and features that need Pro offer **Upgrade to Pro**, which opens toolxbd.com.
+
+- **Limits are on creating, not on keeping.** Apps already on a server stay manageable however many
+  there are. Cron jobs made while you were on Pro stay listed and editable.
+- **Servers belong to this computer**, shared by every account signed in on it. On Free, the two
+  servers added first open; the rest are listed, locked, until one of the two is removed or the
+  account is Pro.
+
+### Checking your plan again
+
+Bought Pro while the app was open? Choose **Check my plan again** from the account menu. The new
+plan reaches every window at once.
+
+## Easy mode and Advanced mode
+
+Every server window has an **Advanced mode** switch at the foot of its sidebar. Easy mode keeps the
+window about your apps; Advanced mode adds the rest of the server:
+
+- **Live Monitor** and **Uninstaller** in the sidebar,
+- **All services** on the Services page, not only your apps',
+- **Home, logs and nginx config** in the file manager,
+- **Private Git repositories** in the New app wizard,
+- **More than one cron job** on a server.
+
+Advanced mode needs Pro. On Pro, choosing anything that needs it turns it on for you. On Free, those
+pages stay listed with a lock and offer Pro instead.
+
+<Callout type="note">
+  Plans are enforced by the app on your own computer, so they are a product boundary, not a security
+  one. Your servers never depend on your plan: apps keep running whatever it is.
+</Callout>

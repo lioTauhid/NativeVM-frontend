@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 import { screens, type ScreenName } from "@/lib/screens";
@@ -14,6 +15,7 @@ export function WindowFrame({
   eager = false,
   tone = "dark",
   caption,
+  children,
 }: {
   name: ScreenName;
   className?: string;
@@ -22,6 +24,8 @@ export function WindowFrame({
   eager?: boolean;
   tone?: "dark" | "light";
   caption?: string;
+  /** Drawn over the screen, positioned in percentages of it: a highlight, say. */
+  children?: ReactNode;
 }) {
   const screen = screens[name];
   return (
@@ -53,16 +57,19 @@ export function WindowFrame({
           </span>
           <span className="w-[38px] shrink-0" aria-hidden />
         </div>
-        <Image
-          src={screen.image}
-          alt={screen.alt}
-          sizes={sizes}
-          quality={90}
-          placeholder="blur"
-          loading={eager ? "eager" : "lazy"}
-          fetchPriority={eager ? "high" : undefined}
-          className="block h-auto w-full"
-        />
+        <div className="relative">
+          <Image
+            src={screen.image}
+            alt={screen.alt}
+            sizes={sizes}
+            quality={90}
+            placeholder="blur"
+            loading={eager ? "eager" : "lazy"}
+            fetchPriority={eager ? "high" : undefined}
+            className="block h-auto w-full"
+          />
+          {children}
+        </div>
       </div>
       {caption ? (
         <figcaption className="mt-3 text-sm text-neutral-600">{caption}</figcaption>

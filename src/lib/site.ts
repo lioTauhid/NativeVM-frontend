@@ -7,7 +7,7 @@ export const site = {
   url: "https://nativevm.com",
   tagline: "Your own servers, run from your desk.",
   description:
-    "Native VM is a desktop app that provisions, deploys and operates your apps on a bare Ubuntu or Debian VPS, over SSH only. Nothing is installed on the server to run a panel, and nothing listens on a port.",
+    "Native VM is a desktop app for macOS, Windows and Linux that sets up your Ubuntu or Debian server, deploys your apps from Git with one click, and keeps them running. Your credentials never leave your computer. Now in beta.",
   creator: "Md. Tauhid",
   since: 2026,
   contact: {
@@ -26,6 +26,7 @@ export const site = {
 export const mainNav = [
   { label: "Features", href: "/#features" },
   { label: "How it works", href: "/#how-it-works" },
+  { label: "Security", href: "/#security" },
   { label: "Pricing", href: "/#pricing" },
   { label: "Docs", href: "/docs" },
 ] as const;

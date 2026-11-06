@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { Kicker } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { docsNav, docsPages } from "@/lib/docs-nav";
 
@@ -49,7 +50,7 @@ export function DocsSidebar() {
       <aside
         id="docs-nav"
         className={cn(
-          "lg:sticky lg:top-16 lg:block lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-ink/10 lg:pr-6",
+          "scrollbar-thin lg:sticky lg:top-16 lg:block lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-ink/10 lg:pr-6",
           open ? "block border-b border-ink/12 pb-6" : "hidden",
         )}
       >
@@ -72,7 +73,7 @@ export function DocsSidebar() {
           ) : null}
           {sections.map((section) => (
             <div key={section.title} className="mb-7">
-              <p className="kicker mb-2">{section.title}</p>
+              <Kicker className="mb-2">{section.title}</Kicker>
               <ul>
                 {section.items.map((item) => {
                   const active = item.href === pathname;

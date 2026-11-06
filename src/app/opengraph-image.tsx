@@ -76,14 +76,35 @@ export default async function OpengraphImage() {
             <span style={{ color: "#5ccfc0" }}>run from your desk.</span>
           </div>
           <div style={{ marginTop: 30, fontSize: 26, lineHeight: 1.4, color: "rgba(255,255,255,0.68)" }}>
-            Deploy and run apps on a bare Ubuntu or Debian server, over SSH alone.
+            One-click deploys to your own servers. Your credentials never leave your computer.
           </div>
-          <div style={{ marginTop: 40, display: "flex", gap: 12, fontSize: 20, color: "rgba(255,255,255,0.55)" }}>
-            <span>No panel</span>
+          <div
+            style={{
+              marginTop: 40,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              fontSize: 20,
+              color: "rgba(255,255,255,0.55)",
+            }}
+          >
+            <span
+              style={{
+                padding: "4px 10px",
+                border: "1px solid rgba(92,207,192,0.6)",
+                color: "#5ccfc0",
+                fontWeight: 600,
+                letterSpacing: 2,
+                fontSize: 16,
+              }}
+            >
+              BETA
+            </span>
+            <span>macOS</span>
             <span>·</span>
-            <span>No daemon</span>
+            <span>Windows</span>
             <span>·</span>
-            <span>No open port</span>
+            <span>Linux</span>
           </div>
         </div>
         <div

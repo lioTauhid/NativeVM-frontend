@@ -112,11 +112,3 @@ export const frameworks: Framework[] = [
     icon: "code-xml",
   },
 ];
-
-/** Each runtime's versions the wizard offers, newest first (checked 2026-11). */
-export const runtimeVersions = [
-  { runtime: "Node.js", versions: ["26", "24", "22"] },
-  { runtime: "Python", versions: ["3.15", "3.14", "3.13"] },
-  { runtime: ".NET", versions: ["10", "9", "8"] },
-  { runtime: "Java", versions: ["25", "21", "17"] },
-] as const;

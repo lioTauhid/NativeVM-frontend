@@ -85,8 +85,35 @@ export function Mark({ tone = "ok", className }: { tone?: Tone; className?: stri
   return <span aria-hidden className={cn("inline-block size-2 shrink-0", tones[tone], className)} />;
 }
 
-export function Kicker({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cn("kicker", className)}>{children}</p>;
+/** A section's label, led by the app's status mark. */
+export function Kicker({
+  children,
+  className,
+  dark = false,
+}: {
+  children: ReactNode;
+  className?: string;
+  dark?: boolean;
+}) {
+  return (
+    <p className={cn("kicker flex items-center gap-2.5", dark && "text-accent-400", className)}>
+      <span aria-hidden className={cn("size-1.5 shrink-0", dark ? "bg-accent-400" : "bg-accent")} />
+      {children}
+    </p>
+  );
+}
+
+/**
+ * What every dark band carries: a fine grain over its glow, and a lit rule along its top
+ * edge. Put it inside an `isolate` section, after the band's own backdrops.
+ */
+export function DarkBandTexture({ edge = true }: { edge?: boolean }) {
+  return (
+    <>
+      <div aria-hidden className="bg-noise absolute inset-0 -z-10" />
+      {edge ? <div aria-hidden className="hairline-teal absolute inset-x-0 top-0" /> : null}
+    </>
+  );
 }
 
 export function Container({ children, className }: { children: ReactNode; className?: string }) {
@@ -117,7 +144,9 @@ export function SectionIntro({
         className,
       )}
     >
-      <p className={cn("kicker", dark && "text-accent-400")}>{kicker}</p>
+      <Kicker dark={dark} className={cn(align === "center" && "justify-center")}>
+        {kicker}
+      </Kicker>
       <h2
         className={cn(
           "font-wide mt-4 text-[clamp(2rem,4.2vw,3.25rem)] leading-[1.02] font-extrabold tracking-[-0.025em]",
@@ -146,7 +175,7 @@ export function Pill({
   className,
 }: {
   children: ReactNode;
-  tone?: "neutral" | "accent" | "pro" | "dark";
+  tone?: "neutral" | "accent" | "pro" | "dark" | "beta";
   className?: string;
 }) {
   return (
@@ -157,6 +186,8 @@ export function Pill({
         tone === "accent" && "bg-accent-100 text-accent-800",
         tone === "pro" && "bg-ink text-white",
         tone === "dark" && "border border-white/15 text-white/70",
+        // The beta label, on the ink bands and the app bar.
+        tone === "beta" && "border border-accent-400/50 bg-accent-400/10 text-accent-400",
         className,
       )}
     >

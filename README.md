@@ -24,7 +24,8 @@ npm run lint
 | `src/app/download/` | The Download page. |
 | `src/app/docs/**/page.mdx` | The documentation, one MDX file per page. |
 | `src/lib/docs-nav.ts` | The docs sidebar, its order, and so the previous/next links. |
-| `src/lib/release.ts` | **The current version and its download files.** |
+| `src/lib/release.ts` | **The current version, the beta channel, and each platform's files.** |
+| `src/lib/get-release.ts` | **Where every download link comes from**: the downloads API, or the files' folder. |
 | `src/lib/site.ts` | Name, contact details, account links, the main navigation. |
 | `src/lib/plans.ts` | What the Free and Pro plans allow. |
 | `src/lib/frameworks.ts` | The framework tiles and runtime versions. |
@@ -38,9 +39,36 @@ actions, red only for what needs attention, square corners and status marks.
 
 ## Publishing a release
 
+Every page that shows the version or a download reads it from `getRelease()` in
+`src/lib/get-release.ts`, so the links change in one place.
+
+### From a downloads API
+
+Set `DOWNLOADS_API_URL` (server-side; it never reaches the browser) to an endpoint that answers:
+
+```json
+{
+  "version": "0.1.0",
+  "downloads": {
+    "macos-arm64": "https://downloads.example.com/NativeVM-0.1.0-macos-arm64.dmg",
+    "windows-x64": { "url": "https://downloads.example.com/NativeVM-0.1.0-windows-x64-setup.exe", "size": "140 MB" },
+    "linux-x64": "https://downloads.example.com/nativevm_0.1.0_amd64.deb"
+  }
+}
+```
+
+- Each link is an `https` URL, or an object with `url` and, optionally, `size` and `sha256`.
+- A platform with no link shows as not available yet. `macos-x64` (Intel Macs) is accepted too.
+- The answer is cached for an hour, so a new release reaches the site within the hour and the API
+  is asked about once an hour, not once per visitor.
+- If the API can't be reached or answers with anything else, the site keeps the built-in release
+  below, and the server log says why.
+
+### Without the API
+
 1. Upload the files the app's `make package` writes (for example
    `NativeVM-0.1.0-macos-arm64.dmg`) to the GitHub release for the tag `v<version>`, or to any host.
-2. In `src/lib/release.ts`, set `version`, flip `available` on each platform you uploaded, and fill
+2. In `src/lib/release.ts`, set `version`, keep `available` on each platform you uploaded, and fill
    in the sizes. Add a `sha256` only from the exact file you published.
 3. To serve the files from somewhere other than GitHub releases, set
    `NEXT_PUBLIC_DOWNLOAD_BASE_URL` to the folder that holds them.

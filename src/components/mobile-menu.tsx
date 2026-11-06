@@ -11,7 +11,7 @@ export function MobileMenu() {
   const close = () => setOpen(false);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         aria-expanded={open}
@@ -48,7 +48,7 @@ export function MobileMenu() {
               onClick={close}
               className="inline-flex h-12 items-center justify-center gap-2 bg-accent font-semibold text-white"
             >
-              <Download className="size-4" aria-hidden /> Download Native VM
+              <Download className="size-4" aria-hidden /> Download the beta
             </Link>
             <a
               href={site.account.register}

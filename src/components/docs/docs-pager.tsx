@@ -19,7 +19,7 @@ export function DocsPager() {
       {previous ? (
         <Link
           href={previous.href}
-          className="group border border-ink/15 bg-white p-5 transition-colors hover:border-accent"
+          className="group border border-ink/15 bg-white p-5 transition-[border-color,box-shadow] hover:border-accent hover:shadow-[0_24px_50px_-32px_rgba(13,148,136,0.6)]"
         >
           <span className="kicker flex items-center gap-1.5">
             <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" aria-hidden /> Previous
@@ -32,7 +32,7 @@ export function DocsPager() {
       {next ? (
         <Link
           href={next.href}
-          className="group border border-ink/15 bg-white p-5 text-right transition-colors hover:border-accent"
+          className="group border border-ink/15 bg-white p-5 text-right transition-[border-color,box-shadow] hover:border-accent hover:shadow-[0_24px_50px_-32px_rgba(13,148,136,0.6)]"
         >
           <span className="kicker flex items-center justify-end gap-1.5">
             Next <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />

@@ -22,7 +22,7 @@ const archivo = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} · Deploy to your own servers over SSH`,
+    default: `${site.name} · One-click deploys to your own servers`,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -31,15 +31,17 @@ export const metadata: Metadata = {
   keywords: [
     "VPS management",
     "server management",
-    "deploy over SSH",
-    "desktop control panel",
-    "nginx",
+    "one-click deploy",
+    "CI/CD",
+    "deploy from Git",
+    "self-hosting",
+    "desktop app",
     "Let's Encrypt",
-    "systemd",
     "Ubuntu",
     "Debian",
-    "Node.js",
-    "Python",
+    "macOS",
+    "Windows",
+    "Linux",
   ],
   openGraph: {
     type: "website",

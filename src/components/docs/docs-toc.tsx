@@ -51,7 +51,7 @@ function TocList() {
 
   return (
     <aside className="hidden w-56 shrink-0 xl:block">
-      <div className="sticky top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto pt-14 pb-10">
+      <div className="scrollbar-thin sticky top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto pt-14 pb-10">
         {headings.length > 0 ? (
           <>
             <p className="kicker mb-3">On this page</p>

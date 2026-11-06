@@ -17,12 +17,12 @@ type Step = {
 const steps: Step[] = [
   {
     key: "connect",
-    title: "Connect a server",
+    title: "Connect your server",
     summary:
-      "Add any Ubuntu 22.04, 24.04 or Debian 12 VPS by its address, with an SSH key or a password. Or import every host from your ~/.ssh/config.",
+      "Add an Ubuntu or Debian server from any provider with its address and an SSH key or password, or import the servers you already use.",
     points: [
-      "You confirm the host key's fingerprint once; a key that later changes is refused outright.",
-      "A checklist proves root access, the distribution and Python, then installs Native VM's one helper file.",
+      "Nothing to set up on the server first: Native VM checks it for you.",
+      "Your key and password stay on your computer.",
     ],
     screen: "launcher",
   },
@@ -30,21 +30,21 @@ const steps: Step[] = [
     key: "create",
     title: "Create an app",
     summary:
-      "Pick a framework, point at a Git repository or a folder on your computer, and choose its address: your domain, a preview port, or none.",
+      "Pick your framework, point at a Git repository or a folder, and choose where it lives: your own domain, or a preview address to try it first.",
     points: [
-      "The runtime is installed for this app alone, so two apps can run different versions.",
-      "Native VM writes the app's account, its systemd service and its nginx site.",
+      "Node.js, Python, Go, .NET and Java, each app on the version it needs.",
+      "Native VM sets up everything the app needs to run, and to restart itself.",
     ],
     screen: "newApp",
   },
   {
     key: "deploy",
-    title: "Deploy it",
+    title: "Deploy in one click",
     summary:
-      "Fetch, install, build and check happen in a new release the running app can't see. Then one rename switches to it.",
+      "Native VM fetches your code, builds it and checks it's answering before it goes live. From then on, push to Git and press Re-Deploy.",
     points: [
-      "It only counts as up once the app answers on its socket or port.",
-      "If it doesn't come up, the previous release is put straight back.",
+      "A build that fails never takes your site down.",
+      "Roll back to an earlier release in one click.",
     ],
     screen: "appDeploying",
   },
@@ -52,10 +52,10 @@ const steps: Step[] = [
     key: "secure",
     title: "Turn on HTTPS",
     summary:
-      "Point your domain's A record or CNAME at the server. Native VM checks DNS from the server itself before it asks Let's Encrypt for anything.",
+      "Point your domain at the server and switch on HTTPS. Certificates are free from Let's Encrypt, and renew on their own.",
     points: [
-      "A name that doesn't point here yet never burns one of your five attempts an hour.",
-      "Renewal runs from a timer on the server, whether or not your laptop is on.",
+      "Your domain is checked first, so one that isn't ready yet never wastes a certificate.",
+      "Renewal happens on the server, even while your computer is off.",
     ],
     screen: "ssl",
   },
@@ -63,10 +63,10 @@ const steps: Step[] = [
     key: "operate",
     title: "Run it day to day",
     summary:
-      "Watch live output, restart a service, edit an environment variable or a cron job, open a terminal. Every change is shown as a diff first.",
+      "Live logs, restarts, environment variables, scheduled jobs and a terminal, in one window per server.",
     points: [
-      "Failed apps and expiring certificates rise to the top of the Overview.",
-      "Every file Native VM overwrites is copied to /var/backups/nativevm first.",
+      "Anything that needs you rises to the top of the overview.",
+      "You see every change before it's made, and the original is backed up.",
     ],
     screen: "appOverview",
   },

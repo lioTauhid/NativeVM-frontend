@@ -49,6 +49,18 @@
   --animate-rise: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-float: float 6s ease-in-out infinite;
   --animate-scan: scan 2.4s ease-in-out infinite;
+  /* A teal ring that spreads and fades: "press this". */
+  --animate-nudge: nudge 2.2s ease-out infinite;
+
+  @keyframes nudge {
+    0% {
+      box-shadow: 0 0 0 0 rgb(92 207 192 / 0.55);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 12px rgb(92 207 192 / 0);
+    }
+  }
 
   @keyframes blink {
     50% {
@@ -121,10 +133,57 @@
   filter: blur(40px);
 }
 
+/* Fine grain over the dark bands: it softens the glow's gradient steps. Decoration only. */
+@utility bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* The light from above, on the dark bands that open a page. */
+@utility bg-spotlight {
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgb(92 207 192 / 0.17), transparent 70%);
+  pointer-events: none;
+}
+
+/* A teal rule where a dark band begins: the 1px rule, lit. */
+@utility hairline-teal {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(92 207 192 / 0.55) 50%, transparent);
+  pointer-events: none;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(32 30 29 / 0.22) transparent;
+}
+
 @layer base {
+  :root {
+    /* Lets details and other boxes animate to and from their natural height. */
+    interpolate-size: allow-keywords;
+  }
+
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+  }
+
+  /* Headings break into even lines; paragraphs avoid a lone last word. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  dd,
+  figcaption {
+    text-wrap: pretty;
   }
 
   body {
@@ -181,6 +240,19 @@
       opacity: 1;
       transform: none;
     }
+  }
+
+  /* The FAQ's answers slide open where the browser can animate a details element. */
+  .faq-item::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+      content-visibility 0.35s allow-discrete;
+  }
+
+  .faq-item[open]::details-content {
+    block-size: auto;
   }
 
   /* The kicker: the small uppercase label above every heading in the app. */
@@ -311,8 +383,17 @@
     font-family: var(--font-mono);
     font-size: 0.875em;
     background: var(--color-surface);
-    padding: 0.1em 0.35em;
+    border: 1px solid rgb(32 30 29 / 0.08);
+    padding: 0.05em 0.35em;
     word-break: break-word;
+  }
+
+  /* Cards inside an article are links, but not underlined text. */
+  .prose-nvm a.doc-card,
+  .prose-nvm a.doc-card:hover {
+    color: inherit;
+    font-weight: inherit;
+    text-decoration: none;
   }
 
   .prose-nvm blockquote {
@@ -351,6 +432,14 @@
     border-bottom: 1px solid rgb(32 30 29 / 0.2);
     padding: 0.6rem 0.75rem 0.6rem 0;
     vertical-align: top;
+  }
+
+  .prose-nvm tbody tr {
+    transition: background-color 0.15s;
+  }
+
+  .prose-nvm tbody tr:hover {
+    background: rgb(255 255 255 / 0.75);
   }
 
   .prose-nvm img {

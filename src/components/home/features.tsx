@@ -33,7 +33,7 @@ function Card({
   return (
     <article
       className={cn(
-        "reveal group relative flex flex-col overflow-hidden border border-ink/12 bg-white transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_30px_70px_-40px_rgba(13,148,136,0.55)]",
+        "reveal group relative flex flex-col overflow-hidden border border-ink/12 bg-white transition-[border-color,box-shadow,transform] duration-300 before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:origin-left before:scale-x-0 before:bg-accent before:transition-transform before:duration-500 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_30px_70px_-40px_rgba(13,148,136,0.55)] hover:before:scale-x-100",
         className,
       )}
     >
@@ -218,11 +218,11 @@ function TerminalVisual() {
 
 function FilesVisual() {
   const rows = [
-    { depth: 0, name: "/srv/kestrel-api", folder: true },
-    { depth: 1, name: "current → releases/…-4e81d07", folder: true },
-    { depth: 1, name: "releases", folder: true },
-    { depth: 1, name: "shared", folder: true },
-    { depth: 2, name: ".env", folder: false, note: "0600" },
+    { depth: 0, name: "kestrel-api", folder: true },
+    { depth: 1, name: "static", folder: true },
+    { depth: 1, name: "uploads", folder: true, note: "2.4 GB" },
+    { depth: 1, name: "settings.py", folder: false, note: "Edited" },
+    { depth: 1, name: ".env", folder: false, note: "Private" },
   ];
   return (
     <ul className="space-y-1.5 font-mono text-[12px]" aria-hidden>
@@ -260,12 +260,13 @@ function DiffVisual() {
 
 export function Features() {
   return (
-    <section id="features" className="scroll-mt-20 bg-bg py-24 sm:py-32">
+    <section id="features" className="relative isolate scroll-mt-20 overflow-hidden bg-bg py-24 sm:py-32">
+      <div aria-hidden className="bg-grid-ink absolute top-0 left-0 -z-10 h-[620px] w-[70%]" />
       <Container>
         <SectionIntro kicker="One window per server" title="Everything a server needs. Nothing it doesn't.">
           <p>
-            Each server gets its own window: its apps, domains, certificates, services, cron jobs,
-            files and a terminal, all over the one SSH connection.
+            Each server gets its own window with its apps, domains, certificates, services,
+            scheduled jobs, files and a terminal. No browser tabs, no control panel to log in to.
           </p>
         </SectionIntro>
 
@@ -276,48 +277,46 @@ export function Features() {
             className="md:col-span-2"
             visual={<OverviewVisual />}
           >
-            Live CPU, memory, disk and network, read from the kernel&apos;s own /proc rather than
-            scraped from top. A crashed app or a certificate about to expire sits at the top, next to
-            the button that fixes it.
+            CPU, memory, disk and network, live. A crashed app or a certificate about to expire
+            rises to the top, right beside the button that fixes it.
           </Card>
-          <Card icon={ShieldCheck} title="HTTPS that checks DNS first" visual={<CertVisual />}>
-            Let&apos;s Encrypt certificates, issued only once your domain really points at the
-            server. Amber under 21 days, red under 7.
+          <Card icon={ShieldCheck} title="Free HTTPS that renews itself" visual={<CertVisual />}>
+            Let&apos;s Encrypt certificates in a click, issued once your domain points at the
+            server and renewed on their own. You&apos;re warned well before one runs out.
           </Card>
-          <Card icon={Activity} title="Services and live logs" visual={<LogVisual />}>
-            Start, stop and restart systemd services and follow their journal live. When lines pour
-            in too fast, Native VM drops from the middle and tells you how many.
+          <Card icon={Activity} title="Live logs and quick restarts" visual={<LogVisual />}>
+            Follow your app&apos;s output as it happens, and start, stop or restart a service in
+            a click when something needs a kick.
           </Card>
-          <Card icon={Timer} title="Cron jobs that report back" visual={<CronVisual />}>
-            Write a cron schedule; get a systemd timer that knows when it last ran, how it ended and
-            what it printed. Pause it without deleting it.
+          <Card icon={Timer} title="Scheduled jobs that report back" visual={<CronVisual />}>
+            Run tasks on a schedule, shown in plain words. See when each last ran and how it went,
+            and pause one without deleting it.
           </Card>
-          <Card icon={SquareTerminal} title="A real terminal" visual={<TerminalVisual />}>
-            Tabs share the server&apos;s one connection. Full-screen programs reflow as you resize,
-            with 10,000 lines of scrollback.
+          <Card icon={SquareTerminal} title="A terminal, one tab away" visual={<TerminalVisual />}>
+            When you want the command line, it&apos;s already connected. Open as many tabs as you
+            like.
           </Card>
           <Card
             icon={FileDiff}
-            title="Every change is a diff first"
+            title="See every change before it's made"
             className="md:col-span-2"
             visual={<DiffVisual />}
           >
-            Adding a domain, turning on HTTPS, saving a file or an app&apos;s environment: you see
-            exactly what changes, and nothing is sent until you press Apply. If the server&apos;s copy
-            changed since you opened it, the save is refused, never forced.
+            Adding a domain, turning on HTTPS or editing a setting: you see exactly what will
+            change, and nothing happens until you press Apply. The original is backed up first, so
+            it can always be put back.
           </Card>
-          <Card icon={Folder} title="Files, saved atomically" visual={<FilesVisual />}>
-            Browse and edit over SFTP, move folders with rsync. Every write is a temp file and a
-            rename, so a dropped connection never leaves half a config.
+          <Card icon={Folder} title="A file manager for your server" visual={<FilesVisual />}>
+            Browse, edit, upload and move files on the server like folders on your desktop. A
+            dropped connection never leaves a file half-saved.
           </Card>
           <Card icon={Cpu} title="Live Monitor" pro>
-            The real htop, running on the server only while you&apos;re looking at it. Missing on a
-            fresh server? It&apos;s installed for you.
+            Every process on the server, live, so you can see what&apos;s using the CPU and
+            memory right now. It runs only while you&apos;re watching.
           </Card>
           <Card icon={PackageMinus} title="Uninstaller" pro className="md:col-span-1 lg:col-span-2">
-            See every package installed on request, then remove one with a plan that names each
-            package going with it, the space freed and what stops working. Native VM removes exactly
-            that list, or nothing.
+            Clean up software you no longer need. Before anything is removed, you see exactly what
+            goes with it and how much space you&apos;ll get back, and nothing else is touched.
           </Card>
         </div>
       </Container>

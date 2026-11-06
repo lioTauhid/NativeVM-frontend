@@ -1,10 +1,10 @@
 import type { MDXComponents } from "mdx/types";
 import Link from "next/link";
-import type { ComponentProps } from "react";
+import { isValidElement, type ComponentProps } from "react";
 
 import { Callout } from "@/components/docs/callout";
 import { CodeBlock } from "@/components/docs/code-block";
-import { Facts, Screenshot, Steps } from "@/components/docs/doc-parts";
+import { Facts, Screenshot, StartHere, Steps } from "@/components/docs/doc-parts";
 
 /** h2 and h3 get a "#" link to themselves, shown on hover. */
 function AnchoredH2({ id, children, ...props }: ComponentProps<"h2">) {
@@ -46,6 +46,21 @@ function DocLink({ href = "", children, ...props }: ComponentProps<"a">) {
   );
 }
 
+/**
+ * A fenced block. Its language is read here, on the server, and handed to the client
+ * component as text: in the browser the <code> child arrives as a deferred reference.
+ */
+function Pre({ children, ...props }: ComponentProps<"pre">) {
+  const fence = isValidElement<{ className?: string }>(children)
+    ? /language-(\S+)/.exec(children.props.className ?? "")?.[1]
+    : undefined;
+  return (
+    <CodeBlock fence={fence} {...props}>
+      {children}
+    </CodeBlock>
+  );
+}
+
 function Table(props: ComponentProps<"table">) {
   return (
     <div className="my-6 overflow-x-auto">
@@ -58,12 +73,13 @@ const components: MDXComponents = {
   h2: AnchoredH2,
   h3: AnchoredH3,
   a: DocLink,
-  pre: CodeBlock,
+  pre: Pre,
   table: Table,
   Callout,
   Steps,
   Screenshot,
   Facts,
+  StartHere,
 };
 
 export function useMDXComponents(): MDXComponents {

@@ -44,10 +44,18 @@ function Plan({
         <h3 className="font-wide text-3xl font-extrabold tracking-[-0.03em]">{name}</h3>
         {dark ? <Pill tone="accent">Everything</Pill> : null}
       </div>
-      <p className={cn("mt-3 text-[15px] leading-relaxed", dark ? "text-white/65" : "text-neutral-700")}>
+      {/* Three lines tall on wide screens, so both plans' buttons sit level. */}
+      <p
+        className={cn(
+          "mt-3 text-[15px] leading-relaxed lg:min-h-[3lh]",
+          dark ? "text-white/65" : "text-neutral-700",
+        )}
+      >
         {blurb}
       </p>
-      <ul className={cn("mt-7 flex-1 divide-y", dark ? "divide-white/10" : "divide-ink/10")}>
+      <div className="mt-6">{children}</div>
+      <p className={cn("kicker mt-9", dark && "text-white/45")}>What&apos;s included</p>
+      <ul className={cn("mt-2 flex-1 divide-y", dark ? "divide-white/10" : "divide-ink/10")}>
         {planRows.map((row) => (
           <li key={row.feature} className="flex items-center justify-between gap-4 py-3">
             <span className="text-[15px]">
@@ -62,23 +70,28 @@ function Plan({
           </li>
         ))}
       </ul>
-      <div className="mt-8">{children}</div>
     </div>
   );
 }
 
 export function Pricing() {
   return (
-    <section id="pricing" className="scroll-mt-20 bg-bg py-24 sm:py-32">
+    <section id="pricing" className="relative isolate scroll-mt-20 overflow-hidden bg-bg py-24 sm:py-32">
+      <div aria-hidden className="bg-grid-ink absolute inset-x-0 top-0 -z-10 h-[560px]" />
       <Container>
         <SectionIntro kicker="Plans" title="Start free. Go Pro when the fleet grows." align="center">
           <p>
-            Native VM is used with a Native VM account. The free plan covers a couple of servers end
-            to end; Pro lifts every limit and unlocks Advanced mode.
+            Every plan includes one-click deploys, free HTTPS and the same security: your
+            credentials stay on your computer either way. Pro lifts every limit and unlocks Advanced
+            mode.
           </p>
         </SectionIntro>
 
-        <div className="mx-auto mt-14 grid max-w-5xl gap-6 lg:grid-cols-2">
+        <div className="relative mx-auto mt-14 grid max-w-5xl gap-6 lg:grid-cols-2">
+          <div
+            aria-hidden
+            className="glow-teal absolute top-16 -right-28 -z-10 hidden h-[460px] w-[600px] opacity-40 lg:block"
+          />
           <Plan name="Free" plan="free" blurb="For a side project, a client site or two: everything you need to deploy, secure and run them.">
             <ButtonLink href={site.account.register} external variant="secondary" className="w-full">
               Create a free account <ArrowUpRight aria-hidden />
@@ -88,7 +101,7 @@ export function Pricing() {
             name="Pro"
             plan="pro"
             dark
-            blurb="For production fleets: unlimited servers, apps and cron jobs, every service on the box, and private repositories."
+            blurb="For production fleets: unlimited servers, apps and scheduled jobs, every service on the server, and private repositories."
           >
             <ButtonLink href={site.account.upgrade} external className="w-full">
               Upgrade to Pro <ArrowUpRight aria-hidden />
@@ -96,8 +109,8 @@ export function Pricing() {
           </Plan>
         </div>
         <p className="reveal mx-auto mt-8 max-w-2xl text-center text-sm text-neutral-600">
-          Accounts and plans are managed on toolxbd.com. The app checks your plan each time it starts,
-          and again whenever you choose <em>Check my plan again</em> from the account menu.
+          Plans are bought and managed in your account on toolxbd.com. Your apps keep running
+          whatever plan you&apos;re on.
         </p>
       </Container>
     </section>

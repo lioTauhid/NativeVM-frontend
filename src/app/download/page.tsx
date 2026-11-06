@@ -4,77 +4,91 @@ import Link from "next/link";
 
 import { OsBadge } from "@/components/download/os-badge";
 import { RecommendedDownload } from "@/components/download/recommended-download";
-import { Container, Kicker, Mark, Pill } from "@/components/ui";
+import { Container, DarkBandTexture, Kicker, Mark, Pill } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { downloadUrl, platforms, supportedServers, version } from "@/lib/release";
+import { getRelease } from "@/lib/get-release";
+import { supportedServers } from "@/lib/release";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Download",
   description:
-    "Download Native VM for macOS on Apple silicon. Windows and Linux builds are on the way.",
+    "Download the Native VM beta for macOS, Windows and Linux: one-click deploys to your own servers, with your credentials kept on your computer.",
 };
 
-const installSteps: { os: string; available: boolean; steps: React.ReactNode[] }[] = [
-  {
-    os: "macOS",
-    available: true,
-    steps: [
-      <>
-        Open <code>NativeVM-{version}-macos-arm64.dmg</code> and drag <strong>Native VM</strong>{" "}
-        into <strong>Applications</strong>.
-      </>,
-      <>
-        Open it from Applications. This first release isn&apos;t notarized by Apple yet, so macOS may
-        say it can&apos;t check the app: open <strong>System Settings → Privacy &amp; Security</strong>{" "}
-        and choose <strong>Open Anyway</strong>. You only do this once.
-      </>,
-      <>
-        Sign in with your Native VM account, or choose <strong>Create an account</strong>.
-      </>,
-    ],
-  },
-  {
-    os: "Windows",
-    available: false,
-    steps: [
-      <>
-        Run <code>NativeVM-{version}-windows-x64-setup.exe</code>. It installs for your user with no
-        administrator prompt; the installer also offers <strong>all users</strong>.
-      </>,
-      <>
-        Or unzip the portable <code>.zip</code> anywhere and run <code>Native VM.exe</code>.
-      </>,
-      <>Uninstalling keeps your data folder and the credentials in Windows Credential Manager.</>,
-    ],
-  },
-  {
-    os: "Linux",
-    available: false,
-    steps: [
-      <>
-        Install the package: <code>sudo apt install ./nativevm_{version}_amd64.deb</code>
-      </>,
-      <>
-        Open <strong>Native VM</strong> from your applications menu, or run <code>nativevm</code>.
-      </>,
-      <>
-        Or extract the portable <code>.tar.gz</code> and run <code>nativevm/nativevm</code>.
-      </>,
-    ],
-  },
+function installSteps(version: string): { os: string; steps: React.ReactNode[] }[] {
+  return [
+    {
+      os: "macOS",
+      steps: [
+        <>
+          Open <code>NativeVM-{version}-macos-arm64.dmg</code> and drag <strong>Native VM</strong>{" "}
+          into <strong>Applications</strong>.
+        </>,
+        <>
+          Open it from Applications. The beta isn&apos;t notarized by Apple yet, so macOS may say it
+          can&apos;t check the app: open <strong>System Settings → Privacy &amp; Security</strong>{" "}
+          and choose <strong>Open Anyway</strong>. You only do this once.
+        </>,
+        <>
+          Sign in with your Native VM account, or choose <strong>Create an account</strong>.
+        </>,
+      ],
+    },
+    {
+      os: "Windows",
+      steps: [
+        <>
+          Run <code>NativeVM-{version}-windows-x64-setup.exe</code>. It installs for your user with
+          no administrator prompt; the installer also offers <strong>all users</strong>.
+        </>,
+        <>
+          Or unzip the portable <code>.zip</code> anywhere and run <code>Native VM.exe</code>.
+        </>,
+        <>
+          Sign in with your Native VM account, or choose <strong>Create an account</strong>.
+        </>,
+      ],
+    },
+    {
+      os: "Linux",
+      steps: [
+        <>
+          Install the package: <code>sudo apt install ./nativevm_{version}_amd64.deb</code>
+        </>,
+        <>
+          Open <strong>Native VM</strong> from your applications menu, or run{" "}
+          <code>nativevm</code>. The portable <code>.tar.gz</code> runs without installing.
+        </>,
+        <>
+          Sign in with your Native VM account, or choose <strong>Create an account</strong>.
+        </>,
+      ],
+    },
+  ];
+}
+
+const highlights = [
+  "Free plan with a Native VM account",
+  "Your credentials stay on your computer",
+  "One-click Re-Deploy from Git",
+  "No agent or panel on your servers",
 ];
 
 const releaseNotes = [
-  "Connect Ubuntu 22.04, 24.04 and Debian 12 servers with a key or a password, or import them from ~/.ssh/config, with jump hosts.",
+  "Native VM for macOS, Windows and Linux, in beta.",
+  "Connect Ubuntu 22.04, 24.04 and Debian 12 servers with a key or a password, or import the ones you already use.",
   "A New app wizard for Django, FastAPI, Flask, Express, Next.js, Node.js, static sites, Go, ASP.NET Core, Spring Boot and OpenClaw, from Git or a folder on your computer.",
-  "Release-based deploys with a health check, automatic rollback and one-click rollback to any of the last five releases.",
-  "Domains, preview ports and Let's Encrypt certificates, with a DNS check from the server and renewal on the server.",
-  "Live metrics, services and logs, cron jobs as systemd timers, a file manager, terminals and Live Monitor.",
-  "An Uninstaller that plans each removal and removes exactly what it showed you.",
+  "One-click Re-Deploy of your branch's newest commit, checked before it goes live and put back automatically if it doesn't start.",
+  "One-click rollback to any of the last five releases.",
+  "Domains and free HTTPS certificates that renew on their own.",
+  "Live metrics, services and logs, scheduled jobs, a file manager, terminals and Live Monitor.",
+  "An Uninstaller that shows exactly what it will remove before it removes it.",
 ];
 
-export default function DownloadPage() {
+export default async function DownloadPage() {
+  const { version, channel, platforms } = await getRelease();
+
   return (
     <main>
       <section className="relative isolate overflow-hidden bg-ink text-white">
@@ -83,25 +97,22 @@ export default function DownloadPage() {
           aria-hidden
           className="glow-teal absolute top-1/2 right-[-10%] -z-10 h-[520px] w-[760px] -translate-y-1/2 opacity-70"
         />
+        <div aria-hidden className="bg-spotlight absolute inset-x-0 top-0 -z-10 h-[520px]" />
+        <DarkBandTexture edge={false} />
         <Container className="grid items-center gap-12 py-20 sm:py-24 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
           <div>
             <p className="kicker flex items-center gap-2 text-accent-400">
-              <Mark tone="busy" /> Download · Version {version}
+              <Mark tone="busy" /> {channel} · Version {version}
             </p>
             <h1 className="font-wide animate-rise mt-5 text-[clamp(2.75rem,6vw,4.75rem)] leading-[0.98] font-extrabold tracking-[-0.035em]">
               Get Native VM
             </h1>
             <p className="animate-rise mt-6 max-w-xl text-lg leading-relaxed text-white/65 [animation-delay:100ms]">
-              One app for every server you run. Install it, sign in with your Native VM account, and
-              connect your first server. Nothing is installed on the server to run a panel.
+              One app for every server you run, now in beta on macOS, Windows and Linux. Install it,
+              sign in with your Native VM account, and connect your first server.
             </p>
             <ul className="animate-rise mt-8 grid gap-3 text-[15px] text-white/70 [animation-delay:180ms] sm:grid-cols-2">
-              {[
-                "Free plan with a Native VM account",
-                "Checks for updates when you ask",
-                "Your keys stay on your computer",
-                "No agent or daemon on your servers",
-              ].map((item) => (
+              {highlights.map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
                   <Check className="size-4 text-accent-400" aria-hidden /> {item}
                 </li>
@@ -109,74 +120,103 @@ export default function DownloadPage() {
             </ul>
           </div>
           <div className="animate-rise [animation-delay:240ms]">
-            <RecommendedDownload />
+            <RecommendedDownload platforms={platforms} version={version} channel={channel} />
           </div>
         </Container>
       </section>
 
-      <section id="platforms" className="scroll-mt-20 bg-bg py-20 sm:py-24">
+      <section
+        id="platforms"
+        className="relative isolate scroll-mt-20 overflow-hidden bg-bg py-20 sm:py-24"
+      >
+        <div aria-hidden className="bg-grid-ink absolute top-0 right-0 -z-10 h-[520px] w-[65%]" />
         <Container>
           <Kicker>Every platform</Kicker>
           <h2 className="font-wide mt-3 text-3xl font-extrabold tracking-[-0.025em] sm:text-4xl">
             Version {version}
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {platforms.map((item) => (
-              <article
-                key={item.id}
-                className={cn(
-                  "reveal flex flex-col border bg-white p-6 transition-shadow",
-                  item.available
-                    ? "border-accent/50 shadow-[0_30px_70px_-45px_rgba(13,148,136,0.7)]"
-                    : "border-ink/12",
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <OsBadge os={item.os} />
-                  {item.available ? (
-                    <Pill tone="accent">Available</Pill>
-                  ) : (
-                    <Pill tone="neutral">Coming soon</Pill>
+            {platforms.map((item) => {
+              const files = item.available
+                ? item.artifacts.filter((artifact) => artifact.url)
+                : item.artifacts;
+              return (
+                <article
+                  key={item.id}
+                  className={cn(
+                    "reveal flex flex-col border bg-white p-6 transition-shadow",
+                    item.available
+                      ? "border-accent/50 shadow-[0_30px_70px_-45px_rgba(13,148,136,0.7)]"
+                      : "border-ink/12",
                   )}
-                </div>
-                <h3 className="mt-5 text-xl font-bold tracking-[-0.01em]">{item.os}</h3>
-                <p className="kicker mt-1">{item.chip}</p>
-                <p className="mt-3 text-sm leading-snug text-neutral-600">{item.requirement}</p>
-                <ul className="mt-6 flex flex-1 flex-col justify-end gap-2.5">
-                  {item.artifacts.map((artifact) => (
-                    <li key={artifact.file}>
-                      {item.available ? (
-                        <a
-                          href={downloadUrl(artifact.file)}
-                          download=""
-                          className="group flex items-center justify-between gap-3 bg-accent px-4 py-3 text-white transition-colors hover:bg-accent-700"
-                        >
-                          <span>
-                            <span className="block font-semibold">{artifact.label}</span>
-                            <span className="block text-xs text-white/75">
-                              .{artifact.file.split(".").slice(-1)[0]}
-                              {artifact.size ? ` · ${artifact.size}` : ""}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <OsBadge os={item.os} />
+                    {item.available ? (
+                      <Pill tone="accent">{channel}</Pill>
+                    ) : (
+                      <Pill tone="neutral">Not yet</Pill>
+                    )}
+                  </div>
+                  <h3 className="mt-5 text-xl font-bold tracking-[-0.01em]">{item.os}</h3>
+                  <p className="kicker mt-1">{item.chip}</p>
+                  <p className="mt-3 text-sm leading-snug text-neutral-600">{item.requirement}</p>
+                  <ul className="mt-6 flex flex-1 flex-col justify-end gap-2.5">
+                    {files.map((artifact) => (
+                      <li key={artifact.file}>
+                        {item.available && artifact.url ? (
+                          <a
+                            href={artifact.url}
+                            download=""
+                            className="group flex items-center justify-between gap-3 bg-accent px-4 py-3 text-white transition-colors hover:bg-accent-700"
+                          >
+                            <span>
+                              <span className="block font-semibold">{artifact.label}</span>
+                              <span className="block text-xs text-white/75">
+                                .{artifact.file.split(".").slice(-1)[0]}
+                                {artifact.size ? ` · ${artifact.size}` : ""}
+                              </span>
                             </span>
+                            <Download
+                              className="size-[18px] transition-transform group-hover:translate-y-0.5"
+                              aria-hidden
+                            />
+                          </a>
+                        ) : (
+                          <span
+                            aria-disabled
+                            className="flex items-center justify-between gap-3 border border-dashed border-ink/20 px-4 py-3 text-neutral-500"
+                          >
+                            <span>
+                              <span className="block font-semibold">{artifact.label}</span>
+                              <span className="block text-xs">Coming later</span>
+                            </span>
+                            <Download className="size-[18px]" aria-hidden />
                           </span>
-                          <Download className="size-[18px] transition-transform group-hover:translate-y-0.5" aria-hidden />
-                        </a>
-                      ) : (
-                        <span
-                          aria-disabled
-                          className="flex items-center justify-between gap-3 border border-dashed border-ink/20 px-4 py-3 text-neutral-500"
-                        >
-                          <span>
-                            <span className="block font-semibold">{artifact.label}</span>
-                            <span className="block text-xs">Not built yet</span>
-                          </span>
-                          <Download className="size-[18px]" aria-hidden />
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="reveal mt-8 flex flex-col gap-3 border border-accent/30 bg-accent-100/70 p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+            <Pill tone="accent" className="self-start sm:self-auto">
+              {channel}
+            </Pill>
+            <p className="text-[15px] leading-relaxed text-neutral-700">
+              Every build of Native VM is a beta. It&apos;s in active development, so expect regular
+              updates and the occasional rough edge. Found one? Write to{" "}
+              <a
+                href={`mailto:${site.contact.email}`}
+                className="font-semibold text-accent-700 underline underline-offset-4 hover:text-ink"
+              >
+                {site.contact.email}
+              </a>
+              .
+            </p>
           </div>
         </Container>
       </section>
@@ -188,15 +228,15 @@ export default function DownloadPage() {
             Up and running in a minute
           </h2>
           <div className="mt-10 grid gap-10 lg:grid-cols-3 lg:gap-8">
-            {installSteps.map((group) => (
+            {installSteps(version).map((group) => (
               <div key={group.os} className="reveal border-t-2 border-ink pt-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold">{group.os}</h3>
-                  {group.available ? null : <Pill tone="neutral">Coming soon</Pill>}
-                </div>
+                <h3 className="text-xl font-bold">{group.os}</h3>
                 <ol className="mt-5 space-y-4">
                   {group.steps.map((step, index) => (
-                    <li key={index} className="flex gap-4 text-[15px] leading-relaxed text-neutral-700 [&_code]:bg-surface [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.86em] [&_code]:break-all [&_strong]:text-ink">
+                    <li
+                      key={index}
+                      className="flex gap-4 text-[15px] leading-relaxed text-neutral-700 [&_code]:bg-surface [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.86em] [&_code]:break-all [&_strong]:text-ink"
+                    >
                       <span className="font-wide inline-flex size-7 shrink-0 items-center justify-center bg-ink text-sm font-extrabold text-white">
                         {index + 1}
                       </span>
@@ -291,7 +331,10 @@ export default function DownloadPage() {
               </p>
               <p>
                 Questions about a release? Write to{" "}
-                <a href={`mailto:${site.contact.email}`} className="font-semibold text-accent-700 underline underline-offset-4">
+                <a
+                  href={`mailto:${site.contact.email}`}
+                  className="font-semibold text-accent-700 underline underline-offset-4"
+                >
                   {site.contact.email}
                 </a>
                 .
@@ -303,7 +346,7 @@ export default function DownloadPage() {
               <h3 className="font-wide text-2xl font-extrabold tracking-[-0.02em]">
                 What&apos;s in {version}
               </h3>
-              <Pill tone="accent">First release</Pill>
+              <Pill tone="accent">{channel}</Pill>
             </div>
             <ul className="mt-6 space-y-3.5">
               {releaseNotes.map((note) => (

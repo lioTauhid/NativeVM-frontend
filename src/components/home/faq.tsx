@@ -47,6 +47,15 @@ const questions: { q: string; a: React.ReactNode }[] = [
     ),
   },
   {
+    q: "Will Native VM slow my server down?",
+    a: (
+      <>
+        No. Nothing of Native VM runs on your server between your actions, and it never sits
+        between your visitors and your app. Your server&apos;s CPU and memory go to your apps.
+      </>
+    ),
+  },
+  {
     q: "Which servers can it manage?",
     a: (
       <>

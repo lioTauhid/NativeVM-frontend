@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 
 import { site } from "@/lib/site";
 
+// Written once, while the static export is built.
+export const dynamic = "force-static";
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },

@@ -1,7 +1,5 @@
 import "server-only";
 
-import { cacheLife } from "next/cache";
-
 import {
   channel,
   platforms,
@@ -33,16 +31,19 @@ import {
  * Without the API, each file is linked from NEXT_PUBLIC_DOWNLOAD_BASE_URL, or else from
  * the GitHub release for the tag.
  *
- * The answer is kept for an hour: the API is asked about once an hour rather than once
- * per visitor, and a new release reaches the site within the hour.
+ * The site is a static export, so this runs while `npm run build` writes the pages: the
+ * links are fixed into them, and a new release reaches the site with the next build.
+ * Every page asks (its footer shows the version), so the answer is kept for the rest of
+ * the build: the API sees about one request per build worker, not one per page.
  */
-export async function getRelease(): Promise<Release> {
-  "use cache";
-  // Every page shows the version in its footer, so this sets how fresh every page is:
-  // refreshed in the background after an hour, and only after 30 days without a visitor
-  // does one have to wait for the API.
-  cacheLife({ stale: 300, revalidate: 3600, expire: 30 * 24 * 3600 });
+export function getRelease(): Promise<Release> {
+  release ??= loadRelease();
+  return release;
+}
 
+let release: Promise<Release> | undefined;
+
+async function loadRelease(): Promise<Release> {
   const api = process.env.DOWNLOADS_API_URL;
   if (api) {
     const release = await releaseFromApi(api);

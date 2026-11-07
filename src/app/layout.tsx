@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { ogImage } from "@/lib/og-image";
 import { site } from "@/lib/site";
 
 import "./globals.css";
@@ -35,6 +36,7 @@ export const metadata: Metadata = {
     "CI/CD",
     "deploy from Git",
     "self-hosting",
+    "no vendor lock-in",
     "desktop app",
     "Let's Encrypt",
     "Ubuntu",
@@ -49,11 +51,13 @@ export const metadata: Metadata = {
     title: `${site.name}: ${site.tagline}`,
     description: site.description,
     url: site.url,
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name}: ${site.tagline}`,
     description: site.description,
+    images: [ogImage],
   },
 };
 

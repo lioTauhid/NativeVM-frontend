@@ -6,6 +6,7 @@ import { Hero } from "@/components/home/hero";
 import { Pricing } from "@/components/home/pricing";
 import { Security } from "@/components/home/security";
 import { Stats } from "@/components/home/stats";
+import { Why } from "@/components/home/why";
 import { Workflow } from "@/components/home/workflow";
 import { Container, SectionIntro } from "@/components/ui";
 
@@ -18,6 +19,7 @@ export default function HomePage() {
     <main>
       <Hero />
       <Stats />
+      <Why />
 
       <section
         id="how-it-works"

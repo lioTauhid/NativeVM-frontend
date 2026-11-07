@@ -4,17 +4,47 @@ The website for [Native VM](https://nativevm.com), the desktop app that provisio
 deploys and operates apps on your own Linux servers over SSH only: the product page,
 downloads, and the documentation.
 
-Built with Next.js 16 (App Router, Turbopack, Cache Components), Tailwind CSS 4 and MDX.
+Built with Next.js 16 (App Router, Turbopack), Tailwind CSS 4 and MDX, as a **static export**:
+the whole site builds to plain files in `out/`.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
-npm run build      # production build, with type checking
-npm run start      # serve the production build
+npm run dev        # http://localhost:3000, while you work
+npm run build      # the static site, in out/, with type checking
+npm run start      # serve out/ at http://localhost:3000, to check a build
 npm run lint
 ```
+
+`npm run build` runs `next build`, then `scripts/export-images.mjs`, which writes the screenshots as
+WebP at a few widths. Run the build through npm, not `next build` alone, or the images are missing.
+
+## Deploying
+
+Upload `out/` to any web server or static host. Every page is a file: `/download` is
+`download.html` and `/docs/ssl` is `docs/ssl.html`, so the server needs to try the `.html` name, and
+should send `404.html` for anything it can't find. With nginx:
+
+```nginx
+root /var/www/nativevm/out;
+
+location / {
+    try_files $uri $uri.html $uri/index.html =404;
+}
+
+location /_next/static/ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
+error_page 404 /404.html;
+```
+
+Or deploy it with Native VM itself, as a **Next.js** app: it runs `npm run build`, sees the static
+export, and serves `out/` with its own file server, which already does all of the above.
+
+There's no server code at all, so anything that has to change at runtime can't: the download links
+and the version are fixed when the site is built (see below).
 
 ## What's where
 
@@ -33,6 +63,10 @@ npm run lint
 | `src/assets/screenshots/` | Screenshots of the real app (see below). |
 | `src/mdx-components.tsx` | How MDX renders, and the components docs can use. |
 | `src/app/globals.css` | Design tokens, taken from the app's `ui/theme/tokens.py`, and docs typography. |
+| `src/app/og.png/route.tsx` | The card shown when a link is shared, drawn at build time. |
+| `src/lib/image-loader.ts` | Where each `<Image>` loads from in the export: the WebP files the build writes. |
+| `scripts/export-images.mjs` | Writes those WebP files, after `next build`. |
+| `scripts/serve-out.mjs` | `npm run start`: serves `out/` like a static host. |
 
 The look follows the desktop app's own design system: Archivo, one ink colour, the logo's teal for
 actions, red only for what needs attention, square corners and status marks.
@@ -44,7 +78,8 @@ Every page that shows the version or a download reads it from `getRelease()` in
 
 ### From a downloads API
 
-Set `DOWNLOADS_API_URL` (server-side; it never reaches the browser) to an endpoint that answers:
+Set `DOWNLOADS_API_URL` when you build (it's read during the build and never reaches the browser)
+to an endpoint that answers:
 
 ```json
 {
@@ -59,10 +94,10 @@ Set `DOWNLOADS_API_URL` (server-side; it never reaches the browser) to an endpoi
 
 - Each link is an `https` URL, or an object with `url` and, optionally, `size` and `sha256`.
 - A platform with no link shows as not available yet. `macos-x64` (Intel Macs) is accepted too.
-- The answer is cached for an hour, so a new release reaches the site within the hour and the API
-  is asked about once an hour, not once per visitor.
-- If the API can't be reached or answers with anything else, the site keeps the built-in release
-  below, and the server log says why.
+- The API is asked while the site builds, and its links are written into the pages. **Rebuild and
+  redeploy after each release**: with Native VM, that's Re-Deploy.
+- If the API can't be reached or answers with anything else, the build keeps the built-in release
+  below, and its log says why.
 
 ### Without the API
 

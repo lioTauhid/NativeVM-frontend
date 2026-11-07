@@ -10,6 +10,7 @@ const columns = [
   {
     title: "Product",
     links: [
+      { label: "Why Native VM", href: "/#why" },
       { label: "Features", href: "/#features" },
       { label: "How it works", href: "/#how-it-works" },
       { label: "One-click deploys", href: "/#deploy" },
@@ -39,8 +40,11 @@ export async function SiteFooter() {
         <div className="max-w-sm">
           <Wordmark />
           <p className="mt-5 text-[15px] leading-relaxed text-white/55">
-            Set up, deploy and run apps on your own Linux servers, from a desktop app. One-click
-            deploys from Git, and your credentials never leave your computer.
+            <span className="font-semibold text-white/85">
+              Your VPS, your resources, your freedom.
+            </span>{" "}
+            Set up, deploy and run apps on your own Linux servers from a desktop app, with your
+            credentials kept on your computer.
           </p>
           <p className="mt-6 inline-flex items-center gap-2 border border-white/10 px-3 py-1.5 text-[13px] text-white/60">
             <Mark tone="led" /> {channel} · v{version} · macOS, Windows, Linux

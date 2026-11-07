@@ -3,19 +3,23 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
-export const alt = "Native VM: your own servers, run from your desk.";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+import { ogImage } from "@/lib/og-image";
 
-/** The app's Overview, read once at build time rather than on every request. */
+/**
+ * The card shown when a link to the site is shared: the tagline beside the real app.
+ *
+ * It's a route at /og.png rather than an opengraph-image file, so the static export writes
+ * it as out/og.png: a file any web server sends as an image. Drawn once, at build time.
+ */
+export const dynamic = "force-static";
+
+/** The app's Overview, as the card's picture. */
 async function screenshotDataUrl(): Promise<string> {
-  "use cache";
   const screenshot = await readFile(join(process.cwd(), "src/assets/screenshots/overview.png"));
   return `data:image/png;base64,${screenshot.toString("base64")}`;
 }
 
-/** The card shown when a link to the site is shared: the tagline beside the real app. */
-export default async function OpengraphImage() {
+export async function GET() {
   const src = await screenshotDataUrl();
 
   return new ImageResponse(
@@ -118,10 +122,11 @@ export default async function OpengraphImage() {
             boxShadow: "0 40px 80px rgba(0,0,0,0.5)",
           }}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element -- drawn into the PNG, where <Image> can't go */}
           <img src={src} width={840} height={525} alt="" style={{ width: 840, height: 525 }} />
         </div>
       </div>
     ),
-    size,
+    { width: ogImage.width, height: ogImage.height },
   );
 }

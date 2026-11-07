@@ -5,6 +5,7 @@ import { isValidElement, type ComponentProps } from "react";
 import { Callout } from "@/components/docs/callout";
 import { CodeBlock } from "@/components/docs/code-block";
 import { Facts, Screenshot, StartHere, Steps } from "@/components/docs/doc-parts";
+import { AptInstall, ReleaseFile } from "@/components/docs/release-files";
 
 /** h2 and h3 get a "#" link to themselves, shown on hover. */
 function AnchoredH2({ id, children, ...props }: ComponentProps<"h2">) {
@@ -80,6 +81,8 @@ const components: MDXComponents = {
   Screenshot,
   Facts,
   StartHere,
+  ReleaseFile,
+  AptInstall,
 };
 
 export function useMDXComponents(): MDXComponents {

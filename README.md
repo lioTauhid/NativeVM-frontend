@@ -54,8 +54,8 @@ and the version are fixed when the site is built (see below).
 | `src/app/download/` | The Download page. |
 | `src/app/docs/**/page.mdx` | The documentation, one MDX file per page. |
 | `src/lib/docs-nav.ts` | The docs sidebar, its order, and so the previous/next links. |
-| `src/lib/release.ts` | **The current version, the beta channel, and each platform's files.** |
-| `src/lib/get-release.ts` | **Where every download link comes from**: the downloads API, or the files' folder. |
+| `src/lib/release.ts` | **The releases repository, each platform, and the version shown if GitHub can't be reached.** |
+| `src/lib/get-release.ts` | **Where every download link comes from**: the latest GitHub release. |
 | `src/lib/site.ts` | Name, contact details, account links, the main navigation. |
 | `src/lib/plans.ts` | What the Free and Pro plans allow. |
 | `src/lib/frameworks.ts` | The framework tiles and runtime versions. |
@@ -73,44 +73,43 @@ actions, red only for what needs attention, square corners and status marks.
 
 ## Publishing a release
 
-Every page that shows the version or a download reads it from `getRelease()` in
-`src/lib/get-release.ts`, so the links change in one place.
+The Download page, the version on every page and the file names in the docs all come from the
+**latest release** of [lioTauhid/NativeVM-frontend](https://github.com/lioTauhid/NativeVM-frontend/releases),
+which `getRelease()` in `src/lib/get-release.ts` reads from GitHub's API while the site builds.
+A new version needs no change to the code:
 
-### From a downloads API
+1. On GitHub, draft a new release with the tag `v<version>`, for example `v0.8.0`. The tag is the
+   version the site shows; the release's title isn't used.
+2. Attach the files the app's `make package` writes, under the names it gives them (below).
+3. Publish it, with **Set as the latest release** ticked.
+4. **Rebuild and redeploy the site**: with Native VM, that's Re-Deploy. The links are written into
+   the pages when they're built, and the build log names the release it found:
+   `Downloads: Native VM 0.8.0 from https://github.com/…/releases/tag/v0.8.0 (macos-arm64, …)`.
 
-Set `DOWNLOADS_API_URL` when you build (it's read during the build and never reaches the browser)
-to an endpoint that answers:
+Each file goes to a platform by its name:
 
-```json
-{
-  "version": "0.1.0",
-  "downloads": {
-    "macos-arm64": "https://downloads.example.com/NativeVM-0.1.0-macos-arm64.dmg",
-    "windows-x64": { "url": "https://downloads.example.com/NativeVM-0.1.0-windows-x64-setup.exe", "size": "140 MB" },
-    "linux-x64": "https://downloads.example.com/nativevm_0.1.0_amd64.deb"
-  }
-}
-```
+| File | Platform | Shown as |
+|---|---|---|
+| `NativeVM-<version>-macos-arm64.dmg` | macOS, Apple silicon | Disk image |
+| `NativeVM-<version>-macos-x64.dmg` | macOS, Intel | Disk image |
+| `NativeVM-<version>-windows-x64-setup.exe` | Windows | Installer |
+| `NativeVM-<version>-windows-x64.zip` | Windows | Portable .zip |
+| `nativevm_<version>_amd64.deb` | Linux | Debian package |
+| `NativeVM-<version>-linux-x64.tar.gz` | Linux | Portable .tar.gz |
 
-- Each link is an `https` URL, or an object with `url` and, optionally, `size` and `sha256`.
-- A platform with no link shows as not available yet. `macos-x64` (Intel Macs) is accepted too.
-- The API is asked while the site builds, and its links are written into the pages. **Rebuild and
-  redeploy after each release**: with Native VM, that's Re-Deploy.
-- If the API can't be reached or answers with anything else, the build keeps the built-in release
-  below, and its log says why.
-
-### Without the API
-
-1. Upload the files the app's `make package` writes (for example
-   `NativeVM-0.1.0-macos-arm64.dmg`) to the GitHub release for the tag `v<version>`, or to any host.
-2. In `src/lib/release.ts`, set `version`, keep `available` on each platform you uploaded, and fill
-   in the sizes. Add a `sha256` only from the exact file you published.
-3. To serve the files from somewhere other than GitHub releases, set
-   `NEXT_PUBLIC_DOWNLOAD_BASE_URL` to the folder that holds them.
-
-By default, downloads point at `https://github.com/lioTauhid/NativePanel/releases/download/v<version>/`,
-the same repository the app's **Check for updates** reads. That repository must be public, or the
-release must be hosted elsewhere, for visitors to download it.
+- The system comes from the kind of file (`.dmg`, `.exe`, `.deb`) or the name (`macos`, `windows`,
+  `linux`), and the processor from `arm64` or `x64`/`amd64`. A universal `.dmg` serves both kinds of
+  Mac, and `.msi`, `.pkg`, `.rpm` and `.AppImage` files are offered too.
+- A platform with no file shows as **Not yet**. Builds for other processors, and anything that isn't
+  an installer (checksums, signatures), are left out; the build log lists the installers it left out.
+- Sizes and SHA-256 come from GitHub, and a file is offered only once it has finished uploading.
+- While no release is marked Latest (every one is a pre-release), the newest release is used.
+- If GitHub can't be reached, the build still finishes: pages show `fallbackVersion` from
+  `src/lib/release.ts`, and every download opens the latest release on GitHub. The log says why.
+- Without a token, GitHub allows 60 API requests an hour from one address, and a build makes one or
+  two. If builds share an address with other GitHub API traffic, set `GITHUB_TOKEN` (a token with no
+  scopes is enough for a public repository). It's read during the build and never reaches the browser.
+- The repository must stay public for visitors to download the files.
 
 ## Writing docs
 
@@ -130,6 +129,8 @@ GitHub-flavoured Markdown works, including tables. These components are availabl
 - `<Callout type="note | tip | warning | pro" title="...">…</Callout>`
 - `<Steps>` … `</Steps>`: every `###` heading inside becomes a numbered step.
 - `<Screenshot name="overview" caption="..." />`: any name from `src/lib/screens.ts`.
+- `<ReleaseFile name="dmg | installer | deb" />`: that file of the latest release, as inline code.
+- `<AptInstall />`: the Terminal command that installs the latest release's `.deb`.
 
 In MDX, `<` and `{` start JSX, so write paths like `/srv/<app>` inside backticks.
 

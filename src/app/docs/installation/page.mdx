@@ -12,7 +12,7 @@ export const metadata = {
   sign in with your Native VM account.
 </div>
 
-Get the files from the [Download](/download) page. Version 0.1.0 is a **beta**, for **macOS on Apple
+Get the files from the [Download](/download) page. Native VM is in **beta**, for **macOS on Apple
 silicon**, **Windows** and **Linux**; an Intel Mac build is on the way.
 
 ## macOS
@@ -21,12 +21,12 @@ silicon**, **Windows** and **Linux**; an Intel Mac build is on the way.
 
 ### Open the disk image
 
-Open `NativeVM-0.1.0-macos-arm64.dmg` and drag **Native VM** onto the **Applications** link
+Open <ReleaseFile name="dmg" /> and drag **Native VM** onto the **Applications** link
 beside it.
 
 ### Open Native VM
 
-Open it from Applications. This first release isn't notarized by Apple yet, so macOS may say it
+Open it from Applications. The beta isn't notarized by Apple yet, so macOS may say it
 can't check the app for malicious software. Open **System Settings → Privacy & Security**, scroll to
 the message about Native VM, and choose **Open Anyway**. You only do this once.
 
@@ -44,9 +44,10 @@ of the app failing to start.
 
 Native VM runs on **Windows 10 or 11, 64-bit**.
 
-- Run `NativeVM-0.1.0-windows-x64-setup.exe`. It installs for your user with no administrator
+- Run <ReleaseFile name="installer" />. It installs for your user with no administrator
   prompt; the installer also offers to install for all users.
-- Or unzip the portable `.zip` anywhere and run `Native VM.exe`.
+- Or, when the Download page offers the portable `.zip`, unzip it anywhere and run
+  `Native VM.exe`.
 
 Then sign in with your Native VM account, or choose **Create an account**.
 
@@ -54,9 +55,7 @@ Then sign in with your Native VM account, or choose **Create an account**.
 
 Native VM runs on **Ubuntu 22.04 or 24.04, or Debian 12**, on x64.
 
-```bash
-sudo apt install ./nativevm_0.1.0_amd64.deb
-```
+<AptInstall />
 
 Then open **Native VM** from your applications menu, or run `nativevm`. The portable `.tar.gz`
 works without installing: extract it and run `nativevm/nativevm`.

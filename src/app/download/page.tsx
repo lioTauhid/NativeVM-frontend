@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Download, Monitor, Server } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Download, Monitor, Server } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -7,7 +7,7 @@ import { RecommendedDownload } from "@/components/download/recommended-download"
 import { Container, DarkBandTexture, Kicker, Mark, Pill } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { getRelease } from "@/lib/get-release";
-import { supportedServers } from "@/lib/release";
+import { installFiles, supportedServers, type Release } from "@/lib/release";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -16,14 +16,33 @@ export const metadata: Metadata = {
     "Download the Native VM beta for macOS, Windows and Linux: one-click deploys to your own servers, with your credentials kept on your computer.",
 };
 
-function installSteps(version: string): { os: string; steps: React.ReactNode[] }[] {
+/** A file's extension as people say it: .dmg, .tar.gz. */
+function extension(file: string): string {
+  return /\.tar\.gz$/i.test(file) ? ".tar.gz" : `.${file.split(".").pop()}`;
+}
+
+/** "7 November 2026", or nothing if the time can't be read. */
+function releaseDate(published: string | undefined): string | undefined {
+  const date = published ? new Date(published) : undefined;
+  if (!date || Number.isNaN(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function installSteps(release: Release): { os: string; steps: React.ReactNode[] }[] {
+  // Each step names the file as it downloads, and mentions the portable ones only if offered.
+  const { dmg, installer, portableZip, deb, portableTarball } = installFiles(release);
   return [
     {
       os: "macOS",
       steps: [
         <>
-          Open <code>NativeVM-{version}-macos-arm64.dmg</code> and drag <strong>Native VM</strong>{" "}
-          into <strong>Applications</strong>.
+          Open <code>{dmg}</code> and drag <strong>Native VM</strong> into{" "}
+          <strong>Applications</strong>.
         </>,
         <>
           Open it from Applications. The beta isn&apos;t notarized by Apple yet, so macOS may say it
@@ -39,12 +58,16 @@ function installSteps(version: string): { os: string; steps: React.ReactNode[] }
       os: "Windows",
       steps: [
         <>
-          Run <code>NativeVM-{version}-windows-x64-setup.exe</code>. It installs for your user with
-          no administrator prompt; the installer also offers <strong>all users</strong>.
+          Run <code>{installer}</code>. It installs for your user with no administrator prompt;
+          the installer also offers <strong>all users</strong>.
         </>,
-        <>
-          Or unzip the portable <code>.zip</code> anywhere and run <code>Native VM.exe</code>.
-        </>,
+        ...(portableZip
+          ? [
+              <>
+                Or unzip the portable <code>.zip</code> anywhere and run <code>Native VM.exe</code>.
+              </>,
+            ]
+          : []),
         <>
           Sign in with your Native VM account, or choose <strong>Create an account</strong>.
         </>,
@@ -54,11 +77,17 @@ function installSteps(version: string): { os: string; steps: React.ReactNode[] }
       os: "Linux",
       steps: [
         <>
-          Install the package: <code>sudo apt install ./nativevm_{version}_amd64.deb</code>
+          Install the package: <code>sudo apt install ./{deb}</code>
         </>,
         <>
           Open <strong>Native VM</strong> from your applications menu, or run{" "}
-          <code>nativevm</code>. The portable <code>.tar.gz</code> runs without installing.
+          <code>nativevm</code>.
+          {portableTarball ? (
+            <>
+              {" "}
+              The portable <code>.tar.gz</code> runs without installing.
+            </>
+          ) : null}
         </>,
         <>
           Sign in with your Native VM account, or choose <strong>Create an account</strong>.
@@ -87,7 +116,9 @@ const releaseNotes = [
 ];
 
 export default async function DownloadPage() {
-  const { version, channel, platforms } = await getRelease();
+  const release = await getRelease();
+  const { version, channel, url, published, platforms } = release;
+  const released = releaseDate(published);
 
   return (
     <main>
@@ -132,9 +163,23 @@ export default async function DownloadPage() {
         <div aria-hidden className="bg-grid-ink absolute top-0 right-0 -z-10 h-[520px] w-[65%]" />
         <Container>
           <Kicker>Every platform</Kicker>
-          <h2 className="font-wide mt-3 text-3xl font-extrabold tracking-[-0.025em] sm:text-4xl">
-            Version {version}
-          </h2>
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+            <h2 className="font-wide text-3xl font-extrabold tracking-[-0.025em] sm:text-4xl">
+              Version {version}
+            </h2>
+            <p className="text-[15px] text-neutral-600">
+              {released ? <>Released {released} · </> : null}
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-accent-700 underline underline-offset-4 hover:text-ink"
+              >
+                Release notes on GitHub
+                <ArrowUpRight className="ml-1 inline size-3.5 align-[-0.1em]" aria-hidden />
+              </a>
+            </p>
+          </div>
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {platforms.map((item) => {
               const files = item.available
@@ -173,7 +218,7 @@ export default async function DownloadPage() {
                             <span>
                               <span className="block font-semibold">{artifact.label}</span>
                               <span className="block text-xs text-white/75">
-                                .{artifact.file.split(".").slice(-1)[0]}
+                                {extension(artifact.file)}
                                 {artifact.size ? ` · ${artifact.size}` : ""}
                               </span>
                             </span>
@@ -228,7 +273,7 @@ export default async function DownloadPage() {
             Up and running in a minute
           </h2>
           <div className="mt-10 grid gap-10 lg:grid-cols-3 lg:gap-8">
-            {installSteps(version).map((group) => (
+            {installSteps(release).map((group) => (
               <div key={group.os} className="reveal border-t-2 border-ink pt-6">
                 <h3 className="text-xl font-bold">{group.os}</h3>
                 <ol className="mt-5 space-y-4">

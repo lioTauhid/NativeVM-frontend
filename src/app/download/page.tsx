@@ -100,7 +100,7 @@ function installSteps(release: Release): { os: string; steps: React.ReactNode[] 
 const highlights = [
   "Free plan with a Native VM account",
   "Your credentials stay on your computer",
-  "One-click Re-Deploy from Git",
+  "One-click deploys from Git",
   "No agent or panel on your servers",
 ];
 
@@ -108,7 +108,7 @@ const releaseNotes = [
   "Native VM for macOS, Windows and Linux, in beta.",
   "Connect Ubuntu 22.04, 24.04 and Debian 12 servers with a key or a password, or import the ones you already use.",
   "A New app wizard for Django, FastAPI, Flask, Express, Next.js, Node.js, static sites, Go, ASP.NET Core, Spring Boot and OpenClaw, from Git or a folder on your computer.",
-  "One-click Re-Deploy of your branch's newest commit, checked before it goes live and put back automatically if it doesn't start.",
+  "One-click Deploy of your branch's newest commit, exactly as the repository has it, checked before it goes live and put back automatically if it doesn't start.",
   "One-click rollback to any of the last five releases.",
   "Domains and free HTTPS certificates that renew on their own.",
   "Live metrics, services and logs, scheduled jobs, a file manager, terminals and Live Monitor.",
@@ -312,7 +312,8 @@ export default async function DownloadPage() {
             </ul>
             <p className="mt-5 text-sm leading-relaxed text-neutral-600">
               An internet connection when the app starts: it checks your plan with your Native VM
-              account. On macOS, the app is about 160 MB to download and 420 MB installed.
+              account, and looks for a newer version. On macOS, the app is about 160 MB to download
+              and 420 MB installed.
             </p>
           </div>
           <div className="reveal border border-ink/12 bg-white p-7 sm:p-9">
@@ -364,15 +365,19 @@ export default async function DownloadPage() {
             </h2>
             <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-neutral-700">
               <p>
-                Click the Native VM logo at the top left of any window to open{" "}
-                <strong className="text-ink">About Native VM</strong>, then{" "}
-                <strong className="text-ink">Check for updates</strong>. The app looks only when you
-                ask, and the check carries nothing about your servers.
+                Native VM looks for a newer version each time it starts, once you&apos;ve signed
+                in. When one is out, it tells you over the Servers window:{" "}
+                <strong className="text-ink">Download</strong> opens the release, and{" "}
+                <strong className="text-ink">Not now</strong> waits until the next launch. To look
+                yourself, click the Native VM logo at the top left of any window to open{" "}
+                <strong className="text-ink">About Native VM</strong>. The check carries nothing
+                about your servers.
               </p>
               <p>
-                Your servers, host keys and settings live in the app&apos;s data folder and survive
-                updates and uninstalls. On macOS, after an update, the system may ask once for your
-                keychain password before the new build reads your saved credentials.
+                Install the new version over the one you have. Your servers, host keys and settings
+                live in the app&apos;s data folder and survive updates and uninstalls. On macOS,
+                after an update, the system may ask once for your keychain password before the new
+                build reads your saved credentials.
               </p>
               <p>
                 Questions about a release? Write to{" "}

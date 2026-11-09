@@ -17,7 +17,9 @@ export const metadata = {
 
 The first window is the **Servers** window: your saved servers, grouped by their client or project.
 From here you **Connect a server**, **Import from SSH config**, choose where **Credentials** are
-kept, and edit or remove a server from its **⋯** menu.
+kept, and edit or remove a server from its **⋯** menu. While Native VM is in beta, a **Beta** tag
+sits beside its name at the top. When a newer version is out, this is where Native VM tells you; see
+[Updates](/docs/installation#updates).
 
 Opening a server turns that window into the server's window. The switcher beside the server's name
 in the top bar opens any other server in a window of its own. **Switch server**, at the foot of the
@@ -78,9 +80,13 @@ Adding or removing a domain, turning on HTTPS, saving a file and saving an app's
 show a diff first, and send nothing until you press **Apply**. Secret-looking values stay masked in
 the diff, and a replaced one is marked *(changed)*.
 
+Creating or editing an app ends on a **Review** step instead, which says what will be created or
+changed in plain sentences, and sends nothing until you confirm.
+
 ## The account menu and About
 
 - The **account menu**, at the right of the top bar, shows your plan and has **Check my plan again**
   and **Sign out**.
-- **About Native VM** opens from the logo at the left of the top bar: the version, **Check for
-  updates**, support contacts, and the licences of the open-source software the app ships.
+- **About Native VM** opens from the logo at the left of the top bar: the version, whether a newer
+  one is out (it checks as it opens, and again on **Check for updates**), support contacts, and the
+  licences of the open-source software the app ships.

@@ -19,6 +19,9 @@ export const metadata = {
 |---|---|
 | `/usr/local/lib/nativevm/agent-<sha256>.py` | Native VM's helper file. Root-only, run for one action at a time. |
 | `/srv/<app>/` | An app: `repo/`, `releases/`, `shared/` and the `current` link. See [Deploys](/docs/deploys). |
+| `/srv/<app>/repo/` | The server's copy of the app's repository, made to match the remote at every deploy. |
+| `/srv/<app>/.deploy.lock` | Held by the app's deploy while it runs, so only one runs at a time. |
+| `/srv/<app>/releases/<release>/.nativevm-release.json` | The commit or upload a release was built from, and its branch. |
 | `/srv/<app>/shared/.env` | The app's environment, readable only by the app's account. |
 | `/srv/<app>/.nativevm-app.json` | What the app is: its framework, source and settings, so any session can deploy it. |
 | `/opt/nativevm/runtimes/` | Per-app runtimes: Node.js, Python, .NET and Java, side by side. |

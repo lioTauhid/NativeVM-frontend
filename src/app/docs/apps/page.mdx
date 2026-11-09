@@ -34,7 +34,8 @@ Where the code comes from. Two choices, and you can change your mind later with 
 ### Git repository
 
 GitHub, GitLab or any Git server. The server clones and fetches the repository itself, and every
-deploy fetches the newest commit of the branch you choose. Nothing reads the code before it's
+deploy takes the newest commit of the branch you choose, exactly as the remote has it: see
+[Deploying from Git](/docs/deploys#deploying-from-git). Nothing reads the code before it's
 deployed, so the framework's start command is used as it is; if your project keeps its app
 somewhere else, change the start command under advanced settings.
 
@@ -61,7 +62,7 @@ GitHub, the username is yours; for a GitLab deploy token, it's the one the token
 ### Local folder or starter
 
 Code from your computer: **a folder, a `.zip` or a `.tar.gz`**. Native VM packs it on every deploy,
-so a redeploy sends what's on disk now. Before sending, it reads the project and says what it found
+so each deploy sends what's on disk now. Before sending, it reads the project and says what it found
 and what will go wrong, such as "gunicorn is not listed in requirements.txt" or "this looks like
 Flask, not Django", before the deploy rather than in its log.
 
@@ -106,8 +107,8 @@ HTTPS comes after the first deploy, once the app is live and the record points a
 
 ## 5. Review
 
-What will be created: the app's account and service, and the nginx site for its address. Confirm,
-and the launch begins:
+What will be created, in plain sentences: the app's account and service, and the nginx site for its
+address. Confirm, and the launch begins:
 
 1. **Create the app**: its account, its directory under `/srv` and its systemd service.
 2. **Deploy it**: fetch or upload the code, install, build, start, and check that it answers.

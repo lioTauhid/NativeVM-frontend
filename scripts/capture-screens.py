@@ -3,6 +3,8 @@
 Runs the desktop app's own window, model and screens offscreen. The server is the panel
 rig's fixed sample (kestrel-prod-01, in tests/panel_rig.py): nothing connects anywhere,
 the keychain is an in-memory stand-in, and the data folder is a temporary directory.
+The update check the app makes after signing in reads a file naming this build as the
+latest release, as the app's own tests do, so it never asks GitHub and offers nothing.
 Nothing is written into the app's repository.
 
 Run it with the app's own virtualenv, from the app's repository:
@@ -38,7 +40,7 @@ from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 app = QApplication(sys.argv[:1])
 
 from account_rig import AccountServer  # noqa: E402
-from conftest import InMemorySecrets, pump_until  # noqa: E402
+from conftest import InMemorySecrets, latest_release, pump_until  # noqa: E402
 from panel_rig import (  # noqa: E402
     GB,
     HOST,
@@ -48,6 +50,7 @@ from panel_rig import (  # noqa: E402
 )
 
 from nativevm.app import build_services, build_windows  # noqa: E402
+from nativevm.core.about import APP  # noqa: E402
 from nativevm.core.apps import AppStatus  # noqa: E402
 from nativevm.core.metrics import (  # noqa: E402
     CpuSample,
@@ -201,13 +204,13 @@ def main() -> None:
 
     services.monitoring.journal = journal  # type: ignore[method-assign]
 
-    # A redeploy that streams the agent's own progress lines, then keeps building.
+    # A deploy that streams the agent's own progress lines, then keeps building. The
+    # fetch names the branch tip's whole commit, and how it follows the running release.
     deploy_lines = [
         "Fetching https://github.com/kestrel/api.git (main)",
-        "From https://github.com/kestrel/api",
-        "   9f2c1ab..4e81d07  main       -> main",
-        "Exporting 4e81d07 into /srv/kestrel-api/releases/20261106T091512Z-4e81d07",
-        "Linking shared/.env into the release",
+        "  at 4e81d07a3c9f52b6e0d14f8a7c2b95e3d6f01a48 Show delivery estimates",
+        "  3 new commits since the running release (9f2c1ab).",
+        "Exporting 4e81d07 to releases/20261106T091512Z-4e81d07",
         "$ uv sync --frozen --python 3.12",
         "Using CPython 3.12.12",
         "Creating virtual environment at: .venv",
@@ -229,7 +232,9 @@ def main() -> None:
 
     services.deploy.redeploy = redeploy  # type: ignore[method-assign]
 
-    windows = build_windows(services, endpoints=account.endpoints)
+    # The release check finds this very build, so no update is offered over the launcher.
+    release_api = latest_release(tmp / "latest-release.json", f"v{APP.version}")
+    windows = build_windows(services, endpoints=account.endpoints, release_api=release_api)
 
     # The account window, as a new install opens on it.
     try:
@@ -323,7 +328,7 @@ def main() -> None:
     except Exception as error:  # noqa: BLE001
         print("cron capture skipped:", error)
 
-    # A redeploy in progress, on the app's Deploys tab.
+    # A deploy in progress, on the app's Deploys tab.
     try:
         window.open_app("kestrel-api", "deploys")
         settle(0.5)

@@ -6,7 +6,7 @@ import { Container } from "@/components/ui";
 import { frameworks } from "@/lib/frameworks";
 
 const stats = [
-  { value: "1", unit: "click", label: "to deploy your newest commit, with Re-Deploy" },
+  { value: "1", unit: "click", label: "to deploy your newest commit from Git" },
   { value: "0", unit: "", label: "server credentials collected: keys, passwords and tokens stay with you" },
   { value: "0.5", unit: "s", label: "to roll back to the release before, if one misbehaves" },
   { value: "3", unit: "", label: "desktop platforms in beta: macOS, Windows and Linux" },

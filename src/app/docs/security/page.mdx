@@ -56,8 +56,9 @@ has pinned, so a stranger can't turn a mismatch into a softer "new key type" que
 
 ## Changing things safely
 
-- **A diff before every change.** nginx sites, unit files, an app's environment, cron jobs and config
-  files are shown as a diff, and nothing is sent until you confirm.
+- **Every change is shown before it's made.** Changes to nginx sites, unit files, an app's
+  environment, cron jobs and config files are shown as a diff; creating or editing an app ends on a
+  review that says each change in a sentence. Nothing is sent until you confirm.
 - **The server is the source of truth.** Native VM re-reads before every edit and refuses to write if
   the file's checksum moved since you were shown it, with a diff of the change. There's no button to
   force it.
@@ -79,9 +80,12 @@ Native VM talks to the internet in two places, both over HTTPS with certificates
 relaxed:
 
 - **The account service**, when you sign in and when the app starts, to check your plan.
-- **The update check**, only when you choose **Check for updates**.
+- **The update check**, once each time the app starts, after you sign in, and whenever you open
+  **About Native VM**. It asks for the newest release, and nothing else.
 
-Neither carries anything about your servers.
+Neither carries anything about your servers. What the update check gets back is treated as
+untrusted: a version it can't read counts as a failed check, and the only page it will open is a
+release page of Native VM's own.
 
 ## A product boundary, not a security one
 

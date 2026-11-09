@@ -60,11 +60,23 @@ Native VM runs on **Ubuntu 22.04 or 24.04, or Debian 12**, on x64.
 Then open **Native VM** from your applications menu, or run `nativevm`. The portable `.tar.gz`
 works without installing: extract it and run `nativevm/nativevm`.
 
+On an older Linux, apt refuses the package, naming the newer `libc6` it needs, rather than install an
+app that couldn't start.
+
 ## Updates
 
-Click the Native VM logo at the top left of any window to open **About Native VM**, then choose
-**Check for updates**. Native VM only looks when you ask, and the check carries nothing about your
-servers. When a newer release exists, it offers the page to download it from.
+Native VM looks for a newer version once each time it starts, after you sign in. When one is out, an
+**Update available** dialog opens over the Servers window, saying which version it is and when it
+was released:
+
+- **Download** opens the release's page in your browser. Download the file for your system and
+  install it over the version you have: your servers, keys and settings stay as they are.
+- **Not now**, or closing the dialog, puts it off until the next launch.
+
+When there's nothing newer, or the check can't be made, Native VM says nothing. To look yourself,
+click the Native VM logo at the top left of any window to open **About Native VM**: it checks as it
+opens, says what it found, and **Check for updates** there looks again. The check carries nothing
+about your servers.
 
 <Callout type="note" title="macOS keychain after an update">
   Until releases are signed with an Apple Developer ID, macOS sees each new build as a different

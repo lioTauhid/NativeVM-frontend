@@ -31,7 +31,7 @@ services, cron jobs, files, live metrics and a terminal, in one window per serve
   `/usr/local/lib/nativevm/agent-<sha256>.py`, readable only by root. It is run for the length of
   one action, reads JSON and writes JSON, and exits. There is no daemon, no timer and no open port.
 - **The server is the source of truth.** Native VM reads a file again before it changes it, shows
-  you the change as a diff, and refuses to write if the server's copy moved in the meantime.
+  you the change first, and refuses to write if the server's copy moved in the meantime.
 - **Your apps don't depend on the app.** They run under systemd and restart themselves, and
   certificates renew from a timer on the server. Closing Native VM, or switching off your laptop,
   changes nothing on the server.
@@ -54,7 +54,7 @@ services, cron jobs, files, live metrics and a terminal, in one window per serve
 
 | For | You need |
 |---|---|
-| **Your computer** | macOS 15 or later on Apple silicon, Windows 10 or 11 (64-bit), or Ubuntu 22.04, 24.04 or Debian 12. Every build is a beta. An internet connection when the app starts, to check your plan. |
+| **Your computer** | macOS 15 or later on Apple silicon, Windows 10 or 11 (64-bit), or Ubuntu 22.04, 24.04 or Debian 12. Every build is a beta. An internet connection when the app starts, to check your plan and look for a newer version. |
 | **Your account** | A Native VM account from [toolxbd.com](https://www.toolxbd.com/register). The free plan covers two servers. See [Account and plans](/docs/account-and-plans). |
 | **Your servers** | Ubuntu 22.04 LTS, Ubuntu 24.04 LTS or Debian 12, with SSH access as root with a key, or as a user with a password-less sudo rule. |
 

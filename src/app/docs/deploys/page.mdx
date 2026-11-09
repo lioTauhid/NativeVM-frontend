@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Deploys and rollback",
   description:
-    "How Native VM deploys: releases, the deploy sequence, the health check, automatic rollback, and rolling back by hand.",
+    "How Native VM deploys: releases, the deploy sequence, the health check, what a deploy takes from Git, automatic rollback, and rolling back by hand.",
 };
 
 <p className="kicker">Apps</p>
@@ -20,7 +20,8 @@ Each app lives in its own directory on the server:
 
 ```text
 /srv/shop/
-├─ repo/                             a bare mirror of your repository
+├─ repo/                             the server's copy of your repository
+├─ .deploy.lock                      held by the deploy that's running
 ├─ releases/
 │  ├─ 20261103T141204Z-b82d1e4/      an earlier release, still built
 │  └─ 20261106T091512Z-4e81d07/      the newest release
@@ -30,7 +31,8 @@ Each app lives in its own directory on the server:
 
 A release is named for when it was made and what it holds: the commit for code from Git, or the
 first characters of the upload's checksum, because the same files always pack to the same bytes.
-Releases are never changed after they're made. `current` is the only thing that decides what runs.
+Each release also records the commit it was built from, in `.nativevm-release.json`. Releases are
+never changed after they're made. `current` is the only thing that decides what runs.
 
 ## The deploy sequence
 
@@ -63,15 +65,77 @@ Node.js build installs dev dependencies first, because build tools usually live 
 
 ## Deploying again
 
-**Re-Deploy**, in the app page's header, deploys the newest commit of the app's branch, or the folder
-on your computer again, with the settings the app was made with. An app created last week, in
-another session or on another laptop, deploys the same: the app records what it is beside itself on
-the server.
+**Deploy**, in the app page's header, deploys the newest commit of the app's branch, or the folder
+on your computer again, with the settings the app was made with. It's the same button for the
+second deploy as for the hundredth. An app created last week, in another session or on another
+laptop, deploys the same: the app records what it is beside itself on the server.
+
+If an app's first launch failed before the app was created, there's nothing to deploy yet: the
+button says **Try again**, and runs that launch again.
 
 <Callout type="note">
   A folder upload is packed from your computer at every deploy. On a different laptop, where the
   folder doesn't exist, Native VM asks you to choose it again.
 </Callout>
+
+## Deploying from Git
+
+**A deploy never pulls or merges.** The server keeps a copy of your repository with no working files.
+Every deploy first makes that copy exactly what the remote has, branches and tags alike, then exports
+the branch's newest commit into a fresh release. Nothing on the server can conflict with your
+repository, so:
+
+- **A force-pushed or rewritten branch** deploys as the remote has it now.
+- **Edits and stray files on the server** never reach the next release. A release is the commit's
+  files in an empty directory; only `shared/`, with the `.env`, carries over.
+- **A renamed or deleted branch** stops the deploy before anything changes, and the running release
+  keeps serving. The message names the branches the repository has: choose one with **Edit**, then
+  deploy again.
+- **A new repository address** is simply fetched from at the next deploy, and nothing of the old
+  repository's branches is left in the copy.
+- **A tag** can go where the branch's name goes. When no branch has the name, the tag is deployed,
+  and the log says so. A branch always wins over a tag with the same name.
+
+### The log names the commit
+
+Under *Fetch the code*, the deploy's output names the whole commit with its message, and says how it
+follows the release that's running:
+
+```text
+Fetching https://github.com/kestrel/api.git (main)
+  at 4e81d07a3c9f52b6e0d14f8a7c2b95e3d6f01a48 Show delivery estimates
+  3 new commits since the running release (9f2c1ab).
+```
+
+Or it's *the same commit as the running release*, or *the branch was rewritten (force-pushed)* since
+the running release was deployed.
+
+### One deploy of an app at a time
+
+While an app is deploying, a second deploy of it, from this computer or another, is refused at once:
+*kestrel-api is already being deployed*. It isn't queued, because a deploy waiting behind a long
+build could outlive the connection that asked for it. A deploy that's cut off never leaves the app
+locked.
+
+### A damaged copy is replaced
+
+If the server's copy of the repository can't be updated, for example because an earlier fetch was cut
+off halfway, Native VM clones the repository afresh and swaps it in once it's complete, and the log
+says why. The old copy stays in place until then. A timeout, an unreachable host, a refused token or a
+missing repository is reported instead, because a fresh clone would fail the same way.
+
+### What a release leaves out
+
+- **Paths your `.gitattributes` marks `export-ignore`.** Placeholders marked `export-subst` are filled
+  in, which is how setuptools-scm and versioneer read a version without a `.git` directory.
+- **Git submodules.** Their directories are empty in the release, and the deploy names them. Commit
+  that code into the repository, or install it as a package.
+
+### SSH addresses and deploy keys
+
+Native VM doesn't manage deploy keys. An `ssh://` or `git@host:` address is fetched with the server's
+own root key and `known_hosts`. For a private repository, an access token over HTTPS is the supported
+way in: see [Private repositories](/docs/apps#private-repositories).
 
 ## Rolling back
 
@@ -89,6 +153,7 @@ the disk doesn't fill with `node_modules`. The current release is never pruned.
 
 | What | Where |
 |---|---|
+| The server's copy of your repository | `/srv/<app>/repo/` |
 | Your code, per release | `/srv/<app>/releases/<time>-<id>/` |
 | The release that runs | `/srv/<app>/current` |
 | The app's environment | `/srv/<app>/shared/.env`, readable only by the app |

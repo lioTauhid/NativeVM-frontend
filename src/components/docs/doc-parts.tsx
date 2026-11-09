@@ -70,7 +70,7 @@ const startHere: { title: string; href: string; body: string; icon: LucideIcon }
   {
     title: "Deploys and rollback",
     href: "/docs/deploys",
-    body: "One-click Re-Deploy, health checks and rolling back.",
+    body: "One-click deploys from Git, health checks and rolling back.",
     icon: RotateCcw,
   },
   {

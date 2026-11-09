@@ -43,7 +43,7 @@ export const screens = {
   appDeploying: {
     image: appDeploying,
     title: "kestrel-api · Deploying",
-    alt: "A deploy in progress: the code is fetched and the release prepared, Install and build is running, and its output streams beside the steps.",
+    alt: "A deploy in progress: the newest commit on main is fetched, three commits ahead of the running release, the release is prepared, Install and build is running, and its output streams beside the steps.",
   },
   newApp: {
     image: newApp,
@@ -73,7 +73,7 @@ export const screens = {
   launcher: {
     image: launcher,
     title: "Servers",
-    alt: "The Servers window: saved servers grouped by client or project, with Connect a server and Import from SSH config.",
+    alt: "The Servers window, with a Beta tag beside Native VM's name: saved servers grouped by client or project, with Credentials, Import from SSH config and Connect a server.",
   },
   signIn: {
     image: signIn,

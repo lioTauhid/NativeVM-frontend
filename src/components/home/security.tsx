@@ -158,8 +158,8 @@ export function Security() {
           <CloudOff className="mt-0.5 size-5 shrink-0 text-white/45" aria-hidden />
           <span>
             <strong className="font-semibold text-white">No Native VM cloud in between.</strong>{" "}
-            The app contacts us for two things only: your plan, when you sign in, and updates, when
-            you ask. Neither carries anything about your servers.
+            Besides your servers, the app goes online for two things only: checking your plan, and
+            seeing whether a newer version is out. Neither carries anything about your servers.
           </span>
         </p>
 

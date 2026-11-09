@@ -23,14 +23,16 @@ Everything can change except the **name**, which is the app's directory, service
 
 ### Review, then save and redeploy
 
-The last step reads the app's files from the server and shows what saving changes as one diff: the
+The last step reads the app's files from the server and says what saving does, one sentence for each
+change, in the order it happens: for example *The systemd unit is rewritten*, *shared/.env is
+rewritten; the old one is kept in the backups*, or *The old address's site is deleted*. It covers the
 service, the app's record, its `.env` and its nginx site, plus any old site and certificate that will
-be deleted.
+be deleted. The files themselves aren't shown.
 
 **Save and redeploy** then runs as one job:
 
 1. The settings are written. Each file is copied to `/var/backups/nativevm` first, and the save is
-   refused if one changed on the server since you were shown the diff.
+   refused if one changed on the server since the review read it.
 2. A new release is deployed with them.
 3. The address is re-pointed. A new domain gets its site, and its certificate when HTTPS is on. An
    address the app no longer has has its site deleted, and a preview port it gave up is freed.

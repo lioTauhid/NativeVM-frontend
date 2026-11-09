@@ -78,13 +78,30 @@ The Download page, the version on every page and the file names in the docs all 
 which `getRelease()` in `src/lib/get-release.ts` reads from GitHub's API while the site builds.
 A new version needs no change to the code:
 
-1. On GitHub, draft a new release with the tag `v<version>`, for example `v0.8.0`. The tag is the
-   version the site shows; the release's title isn't used.
+1. On GitHub, draft a new release with the tag `v` and the version in the app's `pyproject.toml`,
+   for example `v0.9.0`. The tag is the version the site shows; the release's title isn't used.
 2. Attach the files the app's `make package` writes, under the names it gives them (below).
 3. Publish it, with **Set as the latest release** ticked.
-4. **Rebuild and redeploy the site**: with Native VM, that's Re-Deploy. The links are written into
-   the pages when they're built, and the build log names the release it found:
-   `Downloads: Native VM 0.8.0 from https://github.com/…/releases/tag/v0.8.0 (macos-arm64, …)`.
+4. **Rebuild and redeploy the site**: with Native VM, that's **Deploy** on the site's app page. The
+   links are written into the pages when they're built, and the build log names the release it
+   found: `Downloads: Native VM 0.8.0 from https://github.com/…/releases/tag/v0.8.0 (macos-arm64, …)`.
+
+The same release reaches people who already have the app. Every installed copy asks this
+repository for its latest release once each launch, after signing in, and again whenever About
+opens (`APP.repository` in the app's `core/about.py`). One newer than the copy's own version is
+offered over its Servers window, with a button that opens the release's page. So:
+
+- **Publishing a release as Latest offers it to everyone**, at their next launch. Upload every file
+  before you tick **Set as the latest release**: the offer links to the release page, and the
+  Download page only offers files that have finished uploading.
+- **The tag must be the app's version.** The app compares the tag with its own version, so a tag
+  it can't read fails the check. A pre-release (`v0.9.0-rc.1`) is never offered to installed copies,
+  because GitHub leaves pre-releases out of "latest".
+- **This repository must stay public, and keep its name.** Installed copies keep looking here for
+  updates.
+- **Build each Linux release on the oldest Linux it's for**: Ubuntu 22.04 for x64. The app's
+  `make package` refuses a build that would not start there, and its `.deb` tells apt which `libc6`
+  it needs.
 
 Each file goes to a platform by its name:
 
@@ -145,7 +162,10 @@ PYTHONDONTWRITEBYTECODE=1 QT_QPA_PLATFORM=offscreen QT_SCALE_FACTOR=2 \
 ```
 
 Nothing is written into the app's repository, nothing connects to a server, and the keychain is an
-in-memory stand-in.
+in-memory stand-in. The app's update check reads a local file naming this very build as the latest
+release, so it never asks GitHub and no update dialog covers the Servers window. The deploy log in
+`app-deploying.png` is the app's agent's own progress lines, written out in the script: when the
+agent's wording changes, change `deploy_lines` to match.
 
 ## Fonts
 

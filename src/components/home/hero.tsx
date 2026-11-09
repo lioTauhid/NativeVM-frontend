@@ -52,9 +52,8 @@ export async function Hero() {
 
           <p className="animate-rise mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-white/68 [animation-delay:160ms] sm:text-xl">
             Native VM is the desktop app that sets up your server, deploys your apps and keeps them
-            running. Push to Git, click <span className="whitespace-nowrap">Re-Deploy</span>, and
-            you&apos;re live. Your keys and passwords
-            never leave your computer.
+            running. Push to Git, click Deploy, and you&apos;re live. Your keys and passwords never
+            leave your computer.
           </p>
 
           <div className="animate-rise mt-9 flex flex-col items-center justify-center gap-3 [animation-delay:240ms] sm:flex-row">
@@ -96,7 +95,7 @@ export async function Hero() {
             <p className="mt-2 font-semibold">Show delivery estimates</p>
             <p className="mt-0.5 font-mono text-[12px] text-neutral-600">kestrel-api · 4e81d07</p>
             <p className="mt-4 flex h-9 items-center justify-center gap-2 bg-accent text-sm font-semibold text-white">
-              Re-Deploy <Rocket className="size-3.5" />
+              Deploy <Rocket className="size-3.5" />
             </p>
             <p className="mt-3 flex items-center gap-2 text-[13px] text-neutral-600">
               <Mark tone="ok" className="text-accent" /> Built, checked and live in one click

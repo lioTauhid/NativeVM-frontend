@@ -35,8 +35,8 @@ function StepMark({ state }: { state: StepState }) {
 }
 
 /**
- * An app's header and deploy, as a demo: press Re-Deploy and watch the newest commit on
- * main go live. Nothing leaves the page.
+ * An app's header and deploy, as a demo: press Deploy and watch the newest commit on main
+ * go live. Nothing leaves the page.
  */
 export function RedeployDemo() {
   // null before the first deploy; the step running; steps.length once it's done.
@@ -56,7 +56,7 @@ export function RedeployDemo() {
 
   const status =
     step === null
-      ? "Interactive demo: press Re-Deploy to ship the newest commit on main."
+      ? "Interactive demo: press Deploy to ship the newest commit on main."
       : running
         ? `Deploying ${newest.sha}: ${steps[step].toLowerCase()}…`
         : `Deployed ${newest.sha}. The release before stays on the server, ready to roll back to.`;
@@ -91,7 +91,7 @@ export function RedeployDemo() {
               </>
             ) : (
               <>
-                Re-Deploy <Rocket className="size-4" aria-hidden />
+                Deploy <Rocket className="size-4" aria-hidden />
               </>
             )}
           </button>

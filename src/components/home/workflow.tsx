@@ -41,7 +41,7 @@ const steps: Step[] = [
     key: "deploy",
     title: "Deploy in one click",
     summary:
-      "Native VM fetches your code, builds it and checks it's answering before it goes live. From then on, push to Git and press Re-Deploy.",
+      "Native VM fetches your code, builds it and checks it's answering before it goes live. From then on, push to Git and press Deploy.",
     points: [
       "A build that fails never takes your site down.",
       "Roll back to an earlier release in one click.",

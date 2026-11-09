@@ -10,8 +10,9 @@ const questions: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Yes. The whole app is in beta, on macOS, Windows and Linux. It&apos;s in active
-        development, so expect regular updates and the occasional rough edge. When you find one,
-        write to <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+        development, so expect regular updates and the occasional rough edge. The app tells you
+        when a new version is out. When you find a rough edge, write to{" "}
+        <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
       </>
     ),
   },
@@ -20,9 +21,9 @@ const questions: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         No. Your SSH keys, server passwords and Git tokens stay on your computer, in your
-        system&apos;s keychain. Native VM connects straight to your servers. It contacts us only to
-        check your plan when you sign in, and for updates when you ask, and neither carries anything
-        about your servers.
+        system&apos;s keychain. Native VM connects straight to your servers. Otherwise it goes online
+        only to check your plan and to see whether a newer version is out, and neither carries
+        anything about your servers.
       </>
     ),
   },
@@ -31,8 +32,8 @@ const questions: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Create the app from its Git repository once. Whenever you push new commits, press{" "}
-        <strong>Re-Deploy</strong>: Native VM fetches the newest commit, builds it, checks
-        it&apos;s running and switches over. If the new version doesn&apos;t start, the previous one
+        <strong>Deploy</strong>: Native VM fetches the newest commit on your branch, builds it,
+        checks it&apos;s running and switches over. If the new version doesn&apos;t start, the previous one
         keeps serving, and any earlier release is one click away.
       </>
     ),

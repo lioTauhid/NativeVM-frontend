@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Troubleshooting",
   description:
-    "Fixes for the problems you're most likely to meet: sudo, host keys, unsupported systems, DNS, preview ports, failed deploys, macOS and plans.",
+    "Fixes for the problems you're most likely to meet: sudo, host keys, unsupported systems, DNS, preview ports, failed deploys, Git branches, macOS, Linux and plans.",
 };
 
 <p className="kicker">Reference</p>
@@ -36,6 +36,12 @@ This release isn't notarized by Apple yet. Open **System Settings → Privacy & 
 
 After an update, macOS sees the new build as a different program the first time it reads a saved
 credential. Enter your password and choose **Always Allow**.
+
+### apt won't install the Linux package
+
+apt says the package needs a newer `libc6` than the system has. This Linux is older than Native VM
+supports, and the app couldn't start on it, so apt refuses it rather than install it. Native VM runs
+on Ubuntu 22.04 or 24.04, or Debian 12.
 
 ## Connecting
 
@@ -102,6 +108,24 @@ its **Overview** tab. Common causes:
 - The app listens on a hard-coded port instead of reading `PORT` (or `SOCKET_PATH` for a socket).
 - A `.env` value overrides `PORT` or `HOST`. See [Environment variables](/docs/environment).
 - The start command points at the wrong module or file. Change it under advanced settings in **Edit**.
+
+### "has no branch or tag called …"
+
+The app's branch isn't in the repository any more: it was renamed or deleted, or mistyped. Nothing
+was deployed, and the running release keeps serving. The message lists the branches the repository
+has. Choose **Edit**, set the branch to one of them in the **Source** step, and choose **Save and
+redeploy**.
+
+### "is already being deployed"
+
+Another deploy of the same app is running, from this computer or another. Wait for it to finish,
+then deploy again. Deploys aren't queued, and one that was cut off doesn't keep the app locked.
+
+### The deploy mentions Git submodules
+
+Submodules aren't deployed: their directories are empty in the release. Commit that code into the
+repository, or install it as a package. See
+[What a release leaves out](/docs/deploys#what-a-release-leaves-out).
 
 ### The deploy is asking for a token
 

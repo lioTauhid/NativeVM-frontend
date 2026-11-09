@@ -23,7 +23,7 @@ const promises: { icon: LucideIcon; title: string; body: string }[] = [
   },
 ];
 
-/** One-click CI/CD: push to Git, press Re-Deploy. */
+/** One-click CI/CD: push to Git, press Deploy. */
 export function Deploys() {
   return (
     <section
@@ -43,15 +43,15 @@ export function Deploys() {
           className="max-w-4xl"
           title={
             <>
-              Push to Git. Click <span className="whitespace-nowrap">Re-Deploy.</span>{" "}
-              <span className="text-gradient">You&apos;re live.</span>
+              Push to Git. Click Deploy. <span className="text-gradient">You&apos;re live.</span>
             </>
           }
         >
           <p className="max-w-2xl">
-            Connect your repository once. After that, shipping is one button: Native VM pulls the
-            newest commit, builds it, checks it&apos;s healthy and switches over, with the same
-            settings every time. No pipeline to write, and no YAML.
+            Connect your repository once. After that, shipping is one button: Native VM takes the
+            newest commit on your branch, exactly as you pushed it, builds it, checks it&apos;s
+            healthy and switches over, with the same settings every time. No pipeline to write, and
+            no YAML.
           </p>
         </SectionIntro>
 
@@ -62,14 +62,14 @@ export function Deploys() {
           </div>
           <div className="reveal">
             <WindowFrame name="appDeploys" sizes="(min-width: 1024px) 700px, 100vw">
-              {/* The real Re-Deploy button, in the app page's header. */}
+              {/* The real Deploy button, in the app page's header (measured on app-deploys.png). */}
               <span
                 aria-hidden
-                className="animate-nudge absolute top-[14.8%] left-[84.7%] h-[4.4%] w-[9.4%] outline-2 outline-offset-2 outline-accent-400"
+                className="animate-nudge absolute top-[14.8%] left-[86.5%] h-[4.4%] w-[7.6%] outline-2 outline-offset-2 outline-accent-400"
               />
             </WindowFrame>
             <p className="mt-3 text-sm text-white/55">
-              In the app: Re-Deploy sits in every app&apos;s header, and the Deploys tab keeps the
+              In the app: Deploy sits in every app&apos;s header, and the Deploys tab keeps the
               releases you can roll back to.
             </p>
           </div>

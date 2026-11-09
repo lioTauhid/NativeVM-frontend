@@ -13,7 +13,7 @@ export const planRows: PlanRow[] = [
   { feature: "Servers", free: "2", pro: "Unlimited" },
   { feature: "Apps on each server", free: "2", pro: "Unlimited" },
   { feature: "Scheduled jobs on each server", free: "1", pro: "Unlimited" },
-  { feature: "One-click Re-Deploy and rollback", free: true, pro: true },
+  { feature: "One-click deploys and rollback", free: true, pro: true },
   { feature: "Domains and free HTTPS", free: true, pro: true },
   { feature: "Environment variables and .env upload", free: true, pro: true },
   { feature: "Custom build and start commands", free: true, pro: true },

@@ -19,7 +19,7 @@ export const site = {
   /** Native VM accounts live on toolxbd.com; the app opens these same pages. */
   account: {
     register: "https://www.toolxbd.com/register",
-    upgrade: "https://www.toolxbd.com/",
+    upgrade: "https://www.toolxbd.com/dashboard",
   },
 } as const;
 

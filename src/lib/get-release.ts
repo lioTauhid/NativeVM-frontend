@@ -1,5 +1,8 @@
 import "server-only";
 
+import type { IncomingHttpHeaders } from "node:http";
+import { request } from "node:https";
+
 import {
   channel,
   fallbackVersion,
@@ -31,7 +34,8 @@ import {
  *   GitHub. The build log says why.
  *
  * Every page asks (its footer shows the version), so the answer is kept for the rest of
- * the build: GitHub sees one request per build worker, not one per page. Without a token,
+ * the build: GitHub sees one request per build worker, not one per page. Nothing is kept
+ * between builds: each build asks GitHub again (see get). Without a token,
  * GitHub allows 60 requests an hour from one address; for builds that share one, set
  * GITHUB_TOKEN. It's read on the server and never reaches the browser.
  */
@@ -75,29 +79,57 @@ async function latestRelease(): Promise<Record<string, unknown> | null> {
 /** A GET from GitHub's API for the repository: its JSON, or null if GitHub has no such thing. */
 async function github(path: string): Promise<unknown> {
   const token = process.env.GITHUB_TOKEN;
-  let response: Response;
+  let response: Answer;
   try {
-    response = await fetch(`https://api.github.com/repos/${releaseRepository}/${path}`, {
-      headers: {
-        accept: "application/vnd.github+json",
-        "user-agent": "nativevm-website",
-        "x-github-api-version": "2022-11-28",
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
-      },
-      signal: AbortSignal.timeout(10_000),
+    response = await get(`https://api.github.com/repos/${releaseRepository}/${path}`, {
+      accept: "application/vnd.github+json",
+      "user-agent": "nativevm-website",
+      "x-github-api-version": "2022-11-28",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     });
   } catch (error) {
     throw new Error(`GitHub couldn't be reached (${String(error)})`);
   }
   if (response.status === 404) return null;
-  if (!response.ok) {
+  if (response.status < 200 || response.status > 299) {
     throw new Error(
-      response.headers.get("x-ratelimit-remaining") === "0"
+      response.headers["x-ratelimit-remaining"] === "0"
         ? "GitHub's hourly limit for this address is used up (set GITHUB_TOKEN)"
         : `GitHub answered ${response.status}`,
     );
   }
-  return response.json();
+  return JSON.parse(response.body);
+}
+
+type Answer = { status: number; headers: IncomingHttpHeaders; body: string };
+
+/**
+ * An HTTPS GET, made with Node's own client rather than fetch(). Next keeps the answer to
+ * every fetch() made while `next build` writes the pages in .next/cache/fetch-cache, and
+ * hands later builds that same answer with no expiry, so a new release would never reach
+ * the site. (`cache: "no-store"` would stop that, but it makes every page dynamic, which a
+ * static export refuses.)
+ */
+function get(url: string, headers: Record<string, string>): Promise<Answer> {
+  return new Promise((resolve, reject) => {
+    const sent = request(url, { headers, signal: AbortSignal.timeout(10_000) }, (response) => {
+      const chunks: Buffer[] = [];
+      response.on("data", (chunk: Buffer) => chunks.push(chunk));
+      response.on("error", reject);
+      response.on("end", () =>
+        resolve({
+          status: response.statusCode ?? 0,
+          headers: response.headers,
+          body: Buffer.concat(chunks).toString("utf8"),
+        }),
+      );
+      response.on("close", () => {
+        if (!response.complete) reject(new Error("the answer was cut off"));
+      });
+    });
+    sent.on("error", reject);
+    sent.end();
+  });
 }
 
 type ReleaseFile = { platforms: PlatformId[]; rank: number; artifact: Artifact };

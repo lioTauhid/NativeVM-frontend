@@ -23,8 +23,9 @@ export const metadata = {
 | `/srv/<app>/.deploy.lock` | Held by the app's deploy while it runs, so only one runs at a time. |
 | `/srv/<app>/releases/<release>/.nativevm-release.json` | The commit or upload a release was built from, and its branch. |
 | `/srv/<app>/shared/.env` | The app's environment, readable only by the app's account. |
+| `/srv/<app>/shared/config/` | A Spring Boot or ASP.NET Core app's configuration files, readable only by the app's account. See [Configuration files](/docs/environment#configuration-files). |
 | `/srv/<app>/.nativevm-app.json` | What the app is: its framework, source and settings, so any session can deploy it. |
-| `/opt/nativevm/runtimes/` | Per-app runtimes: Node.js, Python, .NET and Java, side by side. |
+| `/opt/nativevm/runtimes/` | Per-app runtimes: Node.js, Python, .NET and Java, side by side, and the JDK or .NET SDK for an app built on the server. |
 | `/opt/nativevm/runtimes/bin/` | The uv and fnm binaries, verified against checksums in the helper file. |
 | `/var/backups/nativevm/<time>/` | A copy of every file Native VM overwrote or deleted, under its original path. |
 | `~/.nativevm-uploads/` | In the SSH user's home: uploads waiting to be unpacked. Each is removed after use. |
@@ -63,5 +64,5 @@ carry its own comment, and never touches the port SSH arrives on.
 | What | Where |
 |---|---|
 | Saved servers, trusted host keys, session metrics | The data folder: `~/Library/Application Support/nativevm/Native VM` on macOS, `%LOCALAPPDATA%\nativevm\Native VM` on Windows, `~/.local/share/nativevm/Native VM` on Linux |
-| Passwords, passphrases, Git tokens and your session | Your OS keychain, or `credentials.sqlite3` and `credentials.key` in the data folder if you chose the encrypted store |
+| Passwords, passphrases, Git tokens and your session | `credentials.sqlite3` in the data folder, encrypted, and this computer's half of its key in `credentials.key` beside it. See [Credentials](/docs/credentials). |
 | Your private keys | Where they already are. Native VM stores their path, never a copy. |

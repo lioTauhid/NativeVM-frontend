@@ -108,10 +108,13 @@ const releaseNotes = [
   "Native VM for macOS, Windows and Linux, in beta.",
   "Connect Ubuntu 22.04, 24.04 and Debian 12 servers with a key or a password, or import the ones you already use.",
   "A New app wizard for Django, FastAPI, Flask, Express, Next.js, Node.js, static sites, Go, ASP.NET Core, Spring Boot and OpenClaw, from Git or a folder on your computer.",
+  "Spring Boot and ASP.NET Core projects built on your server from their source, with your application.yml or appsettings.json uploaded beside them.",
+  "Saved passwords and tokens encrypted on your computer, with no master password or system prompts, and kept across updates and reinstalls.",
   "One-click Deploy of your branch's newest commit, exactly as the repository has it, checked before it goes live and put back automatically if it doesn't start.",
   "One-click rollback to any of the last five releases.",
   "Domains and free HTTPS certificates that renew on their own.",
   "Live metrics, services and logs, scheduled jobs, a file manager, terminals and Live Monitor.",
+  "Windows that fit a small laptop screen, down to 960 × 540.",
   "An Uninstaller that shows exactly what it will remove before it removes it.",
 ];
 
@@ -374,10 +377,11 @@ export default async function DownloadPage() {
                 about your servers.
               </p>
               <p>
-                Install the new version over the one you have. Your servers, host keys and settings
-                live in the app&apos;s data folder and survive updates and uninstalls. On macOS,
-                after an update, the system may ask once for your keychain password before the new
-                build reads your saved credentials.
+                Install the new version over the one you have. Your servers, host keys, settings
+                and encrypted credentials live in the app&apos;s data folder and survive updates
+                and uninstalls. Coming from a version before 0.10, which kept passwords in your
+                system keychain? Native VM no longer uses the keychain, so it asks for each one
+                once more.
               </p>
               <p>
                 Questions about a release? Write to{" "}

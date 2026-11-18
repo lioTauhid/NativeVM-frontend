@@ -65,7 +65,7 @@ export function Deploys() {
               {/* The real Deploy button, in the app page's header (measured on app-deploys.png). */}
               <span
                 aria-hidden
-                className="animate-nudge absolute top-[14.8%] left-[86.5%] h-[4.4%] w-[7.6%] outline-2 outline-offset-2 outline-accent-400"
+                className="animate-nudge absolute top-[15%] left-[86.5%] h-[4.4%] w-[7.6%] outline-2 outline-offset-2 outline-accent-400"
               />
             </WindowFrame>
             <p className="mt-3 text-sm text-white/55">

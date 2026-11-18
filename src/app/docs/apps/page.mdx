@@ -39,6 +39,11 @@ deploy takes the newest commit of the branch you choose, exactly as the remote h
 deployed, so the framework's start command is used as it is; if your project keeps its app
 somewhere else, change the start command under advanced settings.
 
+For **Spring Boot** and **ASP.NET Core**, **The repository holds** says what's in it: **Source
+code**, the default, which the server builds at every deploy, or a build committed before it was
+pushed (**Runnable jar** or **Published build**). See
+[Built on the server](/docs/frameworks#built-on-the-server).
+
 ### Private repositories
 
 Turn on **Private repository** under the Git fields and give a username and an access token. For
@@ -66,16 +71,21 @@ so each deploy sends what's on disk now. Before sending, it reads the project an
 and what will go wrong, such as "gunicorn is not listed in requirements.txt" or "this looks like
 Flask, not Django", before the deploy rather than in its log.
 
+For Spring Boot and ASP.NET Core, the folder can be your built app or its project. When it holds
+both, the build is deployed, and **Build it on the server** builds the project instead.
+
 What's left out of an upload: `.git`, `node_modules`, virtualenvs, caches (including `.next/cache`,
 `.angular/cache` and `.parcel-cache`), `*.pyc`, and the `.env` at the top of the project, because
-every release uses the app's own `.env` from the server instead. Links that point outside the
-project are left out with a note.
+every release uses the app's own `.env` from the server instead. A project the server builds also
+leaves behind what a build on your computer wrote, such as `target/` or `bin/` and `obj/`. Links
+that point outside the project are left out with a note.
 
 Uploads are capped at 256 MB compressed, 1 GB unpacked and 50,000 entries. Bigger belongs in Git,
 where only changes travel.
 
 Or choose the framework's **starter template**: Native VM's own hello world, with a page and
-`GET /health`. It's the quickest way to see a whole deploy work.
+`GET /health`. It's the quickest way to see a whole deploy work. Every framework has one except Go,
+whose code is always your own binary.
 
 ## 3. Configure
 
@@ -86,6 +96,8 @@ The app's **name** and its **runtime version**. Under **advanced settings**:
   off the machine can reach; Node.js, Go, .NET and Java apps default to a port on localhost.
 - **Limits**: memory, CPU and number of tasks. Unset means no limit, not a limit of zero.
 - **Environment variables**, and **Upload .env file**. See [Environment variables](/docs/environment).
+- **Configuration files**, for Spring Boot (**Upload .properties or .yml**) and ASP.NET Core
+  (**Upload appsettings.json**). See [Configuration files](/docs/environment#configuration-files).
 
 ### App names
 

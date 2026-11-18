@@ -25,8 +25,8 @@ export const metadata = {
 | Next.js | Node.js | `next start`, or Native VM's file server for a static export | localhost port |
 | Static site | Node.js | Native VM's file server | unix socket |
 | Go | none: a Linux binary | your binary | localhost port |
-| ASP.NET Core | .NET, or self-contained | your published app | localhost port |
-| Spring Boot | Java, or self-contained | your jar | localhost port |
+| ASP.NET Core | .NET, or self-contained | your published app, or one published on the server | localhost port |
+| Spring Boot | Java, or self-contained | your jar, or one built on the server | localhost port |
 | OpenClaw | Node.js | its Gateway | localhost port |
 
 A socket can't be reached from off the machine, which is one less thing to firewall. Python apps and
@@ -42,8 +42,8 @@ A new app is offered each runtime's three newest supported lines, the newest as 
 |---|---|---|
 | Node.js | 26, 24, 22 | fnm |
 | Python | 3.15, 3.14, 3.13 | uv |
-| .NET | 10, 9, 8 | Microsoft's release metadata |
-| Java | 25, 21, 17 | Eclipse Temurin, from Adoptium |
+| .NET | 10, 9, 8 | Microsoft's release metadata: the runtime, or the SDK for an app built on the server |
+| Java | 25, 21, 17 | Eclipse Temurin, from Adoptium: the JRE, or the JDK for an app built on the server |
 
 Each runtime lives under `/opt/nativevm/runtimes` and each app's service points at its own, so a
 pinned version is real rather than advisory. An app on an older version keeps it, and Edit app offers
@@ -124,19 +124,60 @@ such as `./server`.
 
 ## ASP.NET Core and Spring Boot
 
-These arrive built: the server has no .NET SDK, JDK, Maven or Gradle. Choose how they run:
+Ship one of three things:
 
-- **On a runtime installed for the app**: `.NET 10 · 9 · 8`, or `Java 25 · 21 · 17`. Upload what
-  `dotnet publish -c Release -o publish` wrote, or the jar from `target/` or `build/libs/`.
-- **Self-contained**: a `dotnet publish -r linux-x64 --self-contained` build, a GraalVM native image,
-  or a jlink runtime beside the jar. Only libicu is installed, for .NET.
+- **Your project's source**, which the server builds at every deploy. See
+  [Built on the server](#built-on-the-server) below.
+- **Your build, on a runtime installed for the app**: `.NET 10 · 9 · 8`, or `Java 25 · 21 · 17`.
+  Upload what `dotnet publish -c Release -o publish` wrote, or the jar from `target/` or
+  `build/libs/`.
+- **A self-contained build**: a `dotnet publish -r linux-x64 --self-contained` build, a GraalVM
+  native image, or a jlink runtime beside the jar. Only libicu is installed, for .NET.
 
-Native VM reads the build to offer only what runs it: the .NET line it was published for, or the Java
-that compiled the jar and newer. ASP.NET Core is given `ASPNETCORE_URLS` and trusts nginx's
-forwarded headers; Spring Boot gets `SERVER_PORT`, `SERVER_ADDRESS` and native forwarded headers.
+Native VM reads an upload to tell which it is, and offers only what runs it: the .NET line it was
+published for, or the Java that compiled the jar and newer. A folder with both a jar and its project
+deploys the jar; **Build it on the server**, under the upload, builds the project instead.
 
-A JVM can take most of a minute to start on one core, so a Java app has two minutes and a .NET app
-one minute to come up before a deploy counts as failed. Other apps have 20 seconds.
+From Git, nothing reads the code before the server, so **The repository holds** says which:
+**Source code**, the default, or what was built before it was committed (**Runnable jar** or
+**Published build**). For a build, the Configure step asks for its start command, such as
+`java -jar app.jar` or `dotnet publish/MyApp.dll`.
+
+ASP.NET Core is given `ASPNETCORE_URLS` and trusts nginx's forwarded headers; Spring Boot gets
+`SERVER_PORT`, `SERVER_ADDRESS` and native forwarded headers. A JVM can take most of a minute to
+start on one core, so a Java app has two minutes and a .NET app one minute to come up before a deploy
+counts as failed. Other apps have 20 seconds.
+
+Both read configuration files as well as environment variables: upload `application.yml` or
+`appsettings.json` with the app. See [Configuration files](/docs/environment#configuration-files).
+
+### Built on the server
+
+A Spring Boot or ASP.NET Core app can be its source. Native VM installs what builds it for this app
+alone, the JDK (Eclipse Temurin) or the .NET SDK, and builds each new release before switching to
+it. A build that fails, or writes nothing to run, removes the release, and the previous one keeps
+serving.
+
+| | Spring Boot | ASP.NET Core |
+|---|---|---|
+| The project | Maven or Gradle, with its wrapper: `mvnw` and `.mvn/`, or `gradlew` and `gradle/` | A `.csproj` (or `.fsproj`, `.vbproj`), alone or in a solution, up to three folders down |
+| Built with | `sh mvnw -B -DskipTests package`, or `sh gradlew --no-daemon --console=plain assemble` | `dotnet publish <project> -c Release -o publish` |
+| Its version | From the build file: the pom's `<release>` or `java.version`, or a Gradle toolchain. Never self-contained. | The project's `TargetFramework`: exactly that line is offered. Never self-contained. |
+| What runs | The jar the build wrote, linked as `app.jar` | The program it published, run from `publish/` |
+| Kept between builds | Maven and Gradle downloads, in the app's `shared/` | NuGet packages, in the app's `shared/` |
+
+- **Your own build command** replaces either one under advanced settings, for example to publish
+  one project of several: `dotnet publish src/Shop.Web/Shop.Web.csproj -c Release -o publish`.
+- **Tests are skipped**, since they often want a database the server doesn't have.
+- **Which project.** For .NET, the one web project (`Microsoft.NET.Sdk.Web`) is the app, whatever
+  libraries and test projects sit beside it. For Java, the jar whose manifest names a main class,
+  Spring Boot's own first, never a `-plain`, sources or tests jar.
+- **Memory.** A build wants it: on a server with under 1 GB it may fail for want of it.
+- **What's left out of an upload**: what a build on your computer wrote, such as `target/`,
+  `build/` and `.gradle/` beside a Java project, or `bin/`, `obj/` and `publish/` beside a .NET one.
+
+The **starter templates** for both are projects built this way: Spring Boot 4 built with Maven, and
+a minimal ASP.NET Core API for .NET 10, each with a page and `GET /health`.
 
 ## OpenClaw
 

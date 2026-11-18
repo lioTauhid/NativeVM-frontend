@@ -113,7 +113,7 @@ export async function Hero() {
               {keptLocally.map((item) => (
                 <li key={item} className="flex items-center justify-between py-1.5">
                   {item}
-                  <span className="text-xs text-white/45">Keychain</span>
+                  <span className="text-xs text-white/45">Encrypted</span>
                 </li>
               ))}
             </ul>

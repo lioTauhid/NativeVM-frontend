@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Environment variables",
   description:
-    "Set an app's environment variables, upload a .env file, and know when a change needs a restart or a redeploy.",
+    "Set an app's environment variables, upload a .env file or a Spring Boot or ASP.NET Core app's configuration files, and know when a change needs a restart or a redeploy.",
 };
 
 <p className="kicker">Apps</p>
@@ -32,8 +32,9 @@ A saved environment isn't in use yet. Native VM asks what the app needs:
   restart changes those.
 - **Later** leaves the running app as it is.
 
-Prebuilt code (Go, .NET and Java) is never built on the server, so it only ever needs a restart. A
-stopped app isn't started for you, and an app not yet deployed uses the file on its first deploy.
+Go, .NET and Java apps only ever need a restart: none of them writes the environment into what it
+builds. A stopped app isn't started for you, and an app not yet deployed uses the file on its first
+deploy.
 
 ## Uploading a .env file
 
@@ -67,4 +68,52 @@ would leave nginx proxying to a port your app no longer uses, so do it only on p
 <Callout type="tip">
   A Java app's heap follows its memory limit when one is set. To choose otherwise, set
   `JAVA_TOOL_OPTIONS=-Xmx512m` in its environment.
+</Callout>
+
+## Configuration files
+
+Spring Boot and ASP.NET Core apps are often configured with files rather than variables. Native VM
+keeps them on the server beside `.env`, in `/srv/<app>/shared/config/`, readable only by the app's
+own account. Like `.env`, they belong to no release: a deploy keeps them, and a rollback runs the old
+release with them.
+
+| Framework | Files | How the app finds them |
+|---|---|---|
+| Spring Boot | `application.properties`, `application.yml` or `.yaml`, and a profile's `application-<profile>.*` | Spring Boot is pointed at the folder and reads it at every start, over the settings packaged in the jar. |
+| ASP.NET Core | `appsettings.json`, and an environment's `appsettings.<Environment>.json` | Each file is linked into the folder the app runs from at every deploy, in place of the build's own file of that name. |
+
+Upload them in the wizard's **Configure** step, under the environment variables in advanced
+settings, with **Upload .properties or .yml** or **Upload appsettings.json**: several at once, with a
+`.env` file or instead of one. Up to eight files, 1 MB each. Any other name is refused with the name
+to give it, such as `application-prod.yml` for `prod.yml`.
+
+### On the Environment tab
+
+The app's **Environment** tab lists its files under the variables, with each one's size and the
+profile or environment it's for. Each can be **viewed**, read from the server and shown read-only,
+**replaced** by a file from your computer whatever it's called there, or **removed**, and more can be
+uploaded. Every change is confirmed first, and the file it replaces or removes is backed up.
+
+Spring Boot and ASP.NET Core read their files when they start, so afterwards Native VM offers a
+**restart**. Removing an ASP.NET Core file offers a **redeploy** instead, which brings back the
+build's own file of that name.
+
+### What Native VM checks
+
+- **Contents are never shown** except when you choose to view a file: not in a label, a review or a
+  diff. Files are sent exactly as they are.
+- **ASP.NET Core files are read as ASP.NET Core reads them**, comments and trailing commas allowed.
+  A file it wouldn't start with is refused at upload, with the line.
+- **Notes under the list** say when a file won't be read: a profile's file while no profile is
+  active (set `SPRING_PROFILES_ACTIVE`), an environment's file for another environment than the
+  app's (set `ASPNETCORE_ENVIRONMENT`), or a `.properties` file beside a `.yml` of the same name.
+  They also warn about an ASP.NET Core file that sets `Kestrel:Endpoints` or `Urls`, which would
+  move the app off the port nginx sends visitors to, Maven's `@…@` placeholders, and settings an
+  ahead-of-time Spring build fixed when it was built.
+
+<Callout type="tip">
+  Environment variables win over every file: `shared/.env` overrides a file's value, written
+  `Section__Key` for ASP.NET Core's `Section:Key`. To change a few ASP.NET Core settings, upload
+  `appsettings.Production.json`: it's read over the build's `appsettings.json`, while an uploaded
+  `appsettings.json` replaces the build's whole.
 </Callout>

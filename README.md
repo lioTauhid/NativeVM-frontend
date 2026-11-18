@@ -161,8 +161,8 @@ PYTHONDONTWRITEBYTECODE=1 QT_QPA_PLATFORM=offscreen QT_SCALE_FACTOR=2 \
   .venv/bin/python ../NativeVM-frontend/scripts/capture-screens.py ../NativeVM-frontend/src/assets/screenshots
 ```
 
-Nothing is written into the app's repository, nothing connects to a server, and the keychain is an
-in-memory stand-in. The app's update check reads a local file naming this very build as the latest
+Nothing is written into the app's repository, nothing connects to a server, and the credential store
+is an in-memory stand-in. The app's update check reads a local file naming this very build as the latest
 release, so it never asks GitHub and no update dialog covers the Servers window. The deploy log in
 `app-deploying.png` is the app's agent's own progress lines, written out in the script: when the
 agent's wording changes, change `deploy_lines` to match.

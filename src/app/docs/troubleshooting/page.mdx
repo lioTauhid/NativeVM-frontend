@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Troubleshooting",
   description:
-    "Fixes for the problems you're most likely to meet: sudo, host keys, unsupported systems, DNS, preview ports, failed deploys, Git branches, macOS, Linux and plans.",
+    "Fixes for the problems you're most likely to meet: signing in, saved passwords, sudo, host keys, unsupported systems, DNS, preview ports, failed deploys, Java and .NET builds, macOS, Linux and plans.",
 };
 
 <p className="kicker">Reference</p>
@@ -27,15 +27,24 @@ nothing needs re-entering once you're back online.
 The account service no longer accepts your session, for example because it expired. Sign in again;
 your email is already filled in.
 
+### Signing in keeps failing
+
+Under what went wrong, the sign-in window offers **Keeps happening? Get the latest version**, and so
+does the **Try again / Quit** dialog. An older version may no longer match the account service, and
+Native VM only looks for updates once you're signed in, so this link is how an old copy finds a new
+one. It opens the releases page in your browser and sends nothing itself.
+
 ### macOS won't open the app
 
 This release isn't notarized by Apple yet. Open **System Settings → Privacy & Security** and choose
 **Open Anyway** beside the message about Native VM. Native VM needs macOS 15 or later.
 
-### macOS asks for my keychain password
+### Native VM asks for a saved password again
 
-After an update, macOS sees the new build as a different program the first time it reads a saved
-credential. Enter your password and choose **Always Allow**.
+Versions before 0.10 kept credentials in your system keychain. Native VM no longer reads the
+keychain, so after updating it asks for each password, passphrase or token once more, then keeps it
+encrypted on this computer. It also asks again if `credentials.key` was lost, for example after
+restoring a backup without it. See [Credentials](/docs/credentials).
 
 ### apt won't install the Linux package
 
@@ -70,6 +79,13 @@ rebuilt the server yourself, contact support.
 
 Native VM manages Ubuntu 22.04, Ubuntu 24.04 and Debian 12, and says what it found instead. The other
 checks still run, so you'll still learn whether root access works.
+
+### A server I just added couldn't connect
+
+The server is saved before its first connection, so a typo in the address, port or password leaves
+it marked **Could not connect**. Choose **Edit details** to correct it and connect again, or edit or
+remove it from its **⋯** menu in the Servers window. Only a server that's connecting or connected
+can't be edited or removed.
 
 ### The key file is refused
 
@@ -138,6 +154,21 @@ laptop. Enter it once and choose **Save and deploy**. If the host refused a save
 Native VM reads the build before sending it. A binary for macOS or Windows, or for another processor,
 is named with what to build instead, such as `GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build` or
 `dotnet publish -r linux-x64 --self-contained`.
+
+### A Spring Boot or ASP.NET Core project won't build on the server
+
+For an upload, the Source step says what's missing before anything is sent; from Git, the deploy
+says it:
+
+- **Spring Boot** is built with the project's own wrapper. Commit `mvnw` with its `.mvn` folder, or
+  `gradlew` with its `gradle` folder, with Unix line endings. Generate one with `mvn wrapper:wrapper`
+  or `gradle wrapper`.
+- **ASP.NET Core** needs one web project to publish. With two, or several projects and no web one,
+  name the one to publish in the build command, such as
+  `dotnet publish src/Shop.Web/Shop.Web.csproj -c Release -o publish`. Target .NET 8, 9 or 10.
+
+A build that fails on the server changes nothing: the release is removed and the previous one keeps
+serving. Builds want memory, so on a server with under 1 GB a build may fail for want of it.
 
 ## Plans
 

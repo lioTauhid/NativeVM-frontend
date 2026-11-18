@@ -2,7 +2,7 @@
 
 Runs the desktop app's own window, model and screens offscreen. The server is the panel
 rig's fixed sample (kestrel-prod-01, in tests/panel_rig.py): nothing connects anywhere,
-the keychain is an in-memory stand-in, and the data folder is a temporary directory.
+the credential store is an in-memory stand-in, and the data folder is a temporary directory.
 The update check the app makes after signing in reads a file naming this build as the
 latest release, as the app's own tests do, so it never asks GitHub and offers nothing.
 Nothing is written into the app's repository.

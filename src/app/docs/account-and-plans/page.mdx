@@ -24,8 +24,8 @@ account exists, come back and sign in with the same email and password.
 Native VM opens on its sign-in window, and no server window opens until you've signed in and your
 access has been checked. While it checks, the window says **Checking your access**.
 
-Your session is kept where your credentials are kept, the OS keychain unless you chose otherwise:
-your email and a session token, never your password. The next time you open Native VM, it checks the
+Your session is kept where your credentials are kept, [encrypted on this
+computer](/docs/credentials): your email and a session token, never your password. The next time you open Native VM, it checks the
 session's access again and opens straight onto your servers.
 
 | What the account service answers | What happens |
@@ -55,7 +55,7 @@ shows the sign-in window.
 | Apps created on each server | 2 | No limit |
 | Cron jobs on each server | 1 | No limit |
 | Terminal | Yes | Yes |
-| Wizard's advanced settings: commands, limits, environment | Yes | Yes |
+| Wizard's advanced settings: commands, limits, environment, configuration files | Yes | Yes |
 | An app's environment variables | Yes | Yes |
 | Advanced mode | No | Yes |
 | Live Monitor and Uninstaller | No | Yes |

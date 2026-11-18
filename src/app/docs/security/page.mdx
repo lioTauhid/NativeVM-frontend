@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Security model",
   description:
-    "How Native VM protects servers it holds root on: agentless design, pinned host keys, secrets in the keychain, no shell strings, diffs, snapshots and atomic writes.",
+    "How Native VM protects servers it holds root on: agentless design, pinned host keys, encrypted secrets, no shell strings, diffs, snapshots and atomic writes.",
 };
 
 <p className="kicker">Reference</p>
@@ -45,8 +45,9 @@ has pinned, so a stranger can't turn a mismatch into a softer "new key type" que
 
 ## Secrets
 
-- Kept in your **OS keychain** by default, or sealed with **AES-256-GCM** in Native VM's own store if
-  you choose. See [Credentials](/docs/credentials).
+- Sealed with **AES-256-GCM** and kept on your computer only, with a key made from a part built into
+  the app and a part only this computer has. No master password, and the system keychain isn't
+  used. See [Credentials](/docs/credentials).
 - **Never** written in plaintext, never logged, never in the inventory of servers.
 - **Never on a command line**, where `ps` shows it to every user. Secrets travel on standard input or
   in the environment.

@@ -16,7 +16,7 @@ export const metadata = {
 ## The Servers window
 
 The first window is the **Servers** window: your saved servers, grouped by their client or project.
-From here you **Connect a server**, **Import from SSH config**, choose where **Credentials** are
+From here you **Connect a server**, **Import from SSH config**, see how your **Credentials** are
 kept, and edit or remove a server from its **⋯** menu. While Native VM is in beta, a **Beta** tag
 sits beside its name at the top. When a newer version is out, this is where Native VM tells you; see
 [Updates](/docs/installation#updates).
@@ -49,6 +49,19 @@ open its page, with its own tabs: **Overview**, **Deploys**, **Service**, **Doma
 **Files** and **Environment**.
 
 <Screenshot name="appOverview" caption="An app's page: how it connects, from its domain to its code, with live output." />
+
+## Window sizes
+
+The window opens maximised, and every page fits down to 960 × 540, the space a 1366 × 768 laptop
+leaves at 125% scaling. A window never opens larger than its screen. As it narrows:
+
+- **The sidebar becomes a rail of icons** below about 1140 pixels wide, and scrolls in a short
+  window.
+- **A page's buttons move under its title** where they don't fit beside it.
+- **App tabs and dialogs scroll** rather than squeeze, and the file manager hides its extra columns
+  before it cuts off a name.
+- **The terminal's quick commands fold away**; the button at the end of the tab strip shows or hides
+  them at any width.
 
 ## Status marks
 

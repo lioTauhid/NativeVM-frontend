@@ -20,8 +20,8 @@ const questions: { q: string; a: React.ReactNode }[] = [
     q: "Does Native VM collect my credentials or data?",
     a: (
       <>
-        No. Your SSH keys, server passwords and Git tokens stay on your computer, in your
-        system&apos;s keychain. Native VM connects straight to your servers. Otherwise it goes online
+        No. Your SSH keys, server passwords and Git tokens stay on your computer, encrypted by the
+        app. Native VM connects straight to your servers. Otherwise it goes online
         only to check your plan and to see whether a newer version is out, and neither carries
         anything about your servers.
       </>

@@ -28,8 +28,8 @@ const promises: { icon: LucideIcon; title: string; body: string }[] = [
   },
   {
     icon: KeyRound,
-    title: "Kept in your keychain",
-    body: "Passwords and tokens are stored in your system's own keychain, or encrypted with AES-256 if you prefer. Never in plain text, never in a log.",
+    title: "Encrypted on your computer",
+    body: "Passwords and tokens are encrypted with AES-256 and kept on your computer only. No master password, no system prompts, and they're still there after an update. Never in plain text, never in a log.",
   },
   {
     icon: FingerprintPattern,
@@ -49,7 +49,7 @@ const promises: { icon: LucideIcon; title: string; body: string }[] = [
 ];
 
 const onYourComputer = [
-  "SSH keys, passwords and tokens, in your keychain",
+  "SSH keys, passwords and tokens, encrypted",
   "Your servers, apps and settings, in a local folder",
   "Every action prepared and checked here",
 ];

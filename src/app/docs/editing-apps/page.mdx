@@ -17,7 +17,8 @@ export const metadata = {
 
 Choose **Edit** in the app page's header. The same five steps open on what the app has now: its
 framework, source, runtime and version, build and start commands, socket or port, limits,
-environment variables (secrets masked) and its address.
+environment variables (secrets masked), its address, and a Spring Boot or ASP.NET Core app's
+configuration files (named, never shown).
 
 Everything can change except the **name**, which is the app's directory, service and account.
 
@@ -26,8 +27,8 @@ Everything can change except the **name**, which is the app's directory, service
 The last step reads the app's files from the server and says what saving does, one sentence for each
 change, in the order it happens: for example *The systemd unit is rewritten*, *shared/.env is
 rewritten; the old one is kept in the backups*, or *The old address's site is deleted*. It covers the
-service, the app's record, its `.env` and its nginx site, plus any old site and certificate that will
-be deleted. The files themselves aren't shown.
+service, the app's record, its `.env`, the configuration files written or deleted, and its nginx
+site, plus any old site and certificate that will be deleted. The files themselves aren't shown.
 
 **Save and redeploy** then runs as one job:
 
@@ -56,7 +57,8 @@ Removal happens in this order:
 3. **Its certificates are deleted**, with certbot. Nothing is asked of Let's Encrypt, so no rate limit
    is spent; a certificate you need later is simply issued again.
 
-The app's `.env` and its sites are copied to `/var/backups/nativevm/` before they go.
+The app's `.env`, its configuration files and its sites are copied to `/var/backups/nativevm/`
+before they go.
 
 ### What belongs to an app
 

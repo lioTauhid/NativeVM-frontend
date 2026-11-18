@@ -78,10 +78,11 @@ click the Native VM logo at the top left of any window to open **About Native VM
 opens, says what it found, and **Check for updates** there looks again. The check carries nothing
 about your servers.
 
-<Callout type="note" title="macOS keychain after an update">
-  Until releases are signed with an Apple Developer ID, macOS sees each new build as a different
-  program. The first time an updated Native VM reads a saved password, macOS asks for your keychain
-  password. Choose **Always Allow**.
+<Callout type="note" title="Saved passwords after an update">
+  An update opens every credential the version before it saved: nothing is entered again, and your
+  system never asks for a keychain password. Coming from a version before 0.10, which kept them in
+  the system keychain, Native VM asks for each one once more. See
+  [Credentials](/docs/credentials#coming-from-an-earlier-version).
 </Callout>
 
 **About Native VM** also shows the version and how to reach support. **Copy details** puts the
@@ -97,9 +98,9 @@ Native VM keeps its data on your computer, in one folder:
 | Windows | `%LOCALAPPDATA%\nativevm\Native VM` |
 | Linux | `~/.local/share/nativevm/Native VM` |
 
-It holds your saved servers, the host keys you've trusted, and this session's metrics. Passwords,
-passphrases and tokens are in your OS keychain unless you chose otherwise; see
-[Credentials](/docs/credentials).
+It holds your saved servers, the host keys you've trusted, this session's metrics, and your
+passwords, passphrases and tokens, encrypted in `credentials.sqlite3` with this computer's half of
+the key in `credentials.key`. Back the two up together; see [Credentials](/docs/credentials).
 
 ## Uninstalling
 
@@ -108,5 +109,5 @@ stay, so a reinstall picks up where you left off.
 
 <Callout type="tip">
   To remove saved passwords and passphrases too, delete your servers in Native VM before you
-  uninstall it. Deleting a server deletes its saved secrets, wherever they are kept.
+  uninstall it, or delete the data folder afterwards. Deleting a server deletes its saved secrets.
 </Callout>

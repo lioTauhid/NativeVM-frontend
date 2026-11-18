@@ -32,7 +32,7 @@ const steps: Step[] = [
     summary:
       "Pick your framework, point at a Git repository or a folder, and choose where it lives: your own domain, or a preview address to try it first.",
     points: [
-      "Node.js, Python, Go, .NET and Java, each app on the version it needs.",
+      "Node.js, Python, Go, .NET and Java, each app on the version it needs. Java and .NET projects build right on your server.",
       "Native VM sets up everything the app needs to run, and to restart itself.",
     ],
     screen: "newApp",
